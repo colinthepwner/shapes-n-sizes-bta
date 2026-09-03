@@ -34,6 +34,7 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 - You never trample farmland, and monsters overlook you in favour of whoever is standing behind you.
 - Hold algae to walk on water. Sneaking, jumping onto it or taking a hit drops you through,
   and you have to reach dry land before it will hold you again.
+- Placed algae holds you up too, from half size, so a line of it is a bridge.
 - Hold paper to glide down slowly and land unhurt from any height.
 - At half size or under you climb sheer walls, either by crouching against one or by holding a
   slimeball to climb at a walk.
@@ -53,6 +54,8 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 - A rider sits at a depth that follows their size, so a giant on a pig straddles it rather than
   hovering over it. A tall player asleep in a bed lies down the bed with their head on the pillow
   and their feet off the end.
+- Hold string and right click an animal at least twice your height to climb on and ride it. A
+  saddle is for a full sized person on a pig; string is the version for somebody smaller than one.
 - Wear a saddle in the chestplate slot, then sneak and right click a player at least 1.5x smaller,
   and they ride piggyback. At 3x smaller they ride on your shoulder instead, where they can still
   see. They sneak to get off.

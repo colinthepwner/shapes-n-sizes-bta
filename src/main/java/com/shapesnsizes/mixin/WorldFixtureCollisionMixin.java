@@ -3,6 +3,7 @@ package com.shapesnsizes.mixin;
 import com.shapesnsizes.PlayerScale;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogicButton;
+import net.minecraft.core.block.BlockLogicAlgae;
 import net.minecraft.core.block.BlockLogicFlag;
 import net.minecraft.core.block.BlockLogicLever;
 import net.minecraft.core.block.BlockLogicTorch;
@@ -31,7 +32,11 @@ public class WorldFixtureCollisionMixin {
 	private void shapesnsizes$fixturesAreSolidToTheTiny(Entity entity, AABBdc aabb,
 			CallbackInfoReturnable<List<AABBdc>> cir) {
 		if (!(entity instanceof Player)) return;
-		if (PlayerScale.get((Player) entity) > FIXTURE_SCALE) return;
+		Player player = (Player) entity;
+		float scale = PlayerScale.get(player);
+
+		if (scale > PlayerScale.SMALL) return;
+		boolean fixtures = scale <= FIXTURE_SCALE;
 		List<AABBdc> boxes = cir.getReturnValue();
 		if (boxes == null) return;
 
@@ -49,7 +54,9 @@ public class WorldFixtureCollisionMixin {
 				for (int z = minZ - 1; z <= maxZ; ++z) {
 					pos.set(x, y, z);
 					Block<?> block = world.getBlockType(pos);
-					if (block == null || block == Blocks.AIR || !shapesnsizes$isFixture(block)) continue;
+					if (block == null || block == Blocks.AIR) continue;
+					boolean algae = block.getLogic() instanceof BlockLogicAlgae;
+					if (!algae && !(fixtures && shapesnsizes$isFixture(block))) continue;
 					AABBdc box = block.getSelectionAABB(world, pos);
 					if (box == null || !(aabb instanceof org.joml.primitives.AABBd)) continue;
 					if (!box.intersectsAABB((org.joml.primitives.AABBd) aabb)) continue;

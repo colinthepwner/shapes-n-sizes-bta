@@ -30,6 +30,7 @@
     "BlockLogicBoulderMagmaticMixin",
     "BlockLogicBoulderSulfuricMixin",
     "MobCreeperMixin",
+    "MobRideMixin",
     "MobPathfinderMixin",
     "EntityBoatMixin",
     "EntityMinecartMixin",

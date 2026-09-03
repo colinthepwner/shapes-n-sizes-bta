@@ -339,7 +339,7 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 			cir.setReturnValue(true);
 			return;
 		}
-		rider.startRiding(clicker);
+		Piggyback.ride(rider, clicker);
 		cir.setReturnValue(true);
 	}
 
@@ -348,7 +348,8 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 		if (!(this.passenger instanceof Player)) return;
 		if (this.world.isClientSide) return;
 		if (!Piggyback.stillAllowed(self, (Player) this.passenger)) {
-			this.ejectRider();
+
+			Piggyback.dismount((Player) this.passenger);
 		}
 	}
 

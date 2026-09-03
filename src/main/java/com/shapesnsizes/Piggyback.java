@@ -65,6 +65,31 @@ public final class Piggyback {
 			carrier.z + behindZ * back + rightZ * side);
 	}
 
+	public static void ride(Player rider, net.minecraft.core.world.IVehicle mount) {
+		if (rider == null) return;
+		rider.startRiding(mount);
+		if (rider instanceof RideSync) ((RideSync) rider).shapesnsizes$syncRiding();
+	}
+
+	public static void dismount(Player rider) {
+		ride(rider, null);
+	}
+
+	public static final float MOUNT_RATIO = 2.0f;
+
+	public static boolean canMount(Player rider, net.minecraft.core.entity.Mob mount) {
+		if (rider == null || mount == null || rider == mount) return false;
+		if (!PlayerScale.isSmall(rider)) return false;
+		if (rider.bbHeight <= 0.0f || mount.bbHeight <= 0.0f) return false;
+		if (mount.bbHeight / rider.bbHeight < MOUNT_RATIO) return false;
+		return holdingString(rider);
+	}
+
+	public static boolean holdingString(Player player) {
+		ItemStack held = player.getHeldItem();
+		return held != null && Items.STRING != null && held.itemID == Items.STRING.id;
+	}
+
 	public static boolean isCarried(Entity entity) {
 		return entity instanceof Player && entity.vehicle instanceof Player;
 	}
