@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = Player.class, remap = false)
-public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSized, Wading.Wader {
+public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSized, Wading.Wader, Foliage.Walker {
 	protected PlayerMixin(World world) {
 		super(world);
 	}
@@ -74,6 +74,19 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 
 	@Unique
 	private float shapesnsizes$boxScale = -1.0f;
+
+	@Unique
+	private int shapesnsizes$coasting = 0;
+
+	@Override
+	public int shapesnsizes$coasting() {
+		return this.shapesnsizes$coasting;
+	}
+
+	@Override
+	public void shapesnsizes$setCoasting(int ticks) {
+		this.shapesnsizes$coasting = ticks;
+	}
 
 	@Unique
 	private final Wading.State shapesnsizes$wading = new Wading.State();
@@ -175,17 +188,8 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 			Trample.crushCheck(self);
 		}
 
-		if (++this.shapesnsizes$iceTimer >= ICE_INTERVAL) {
-			this.shapesnsizes$iceTimer = 0;
-			Trample.crackIce(self);
-		}
+		Trample.crackIce(self);
 	}
-
-	@Unique
-	private int shapesnsizes$iceTimer = 0;
-
-	@Unique
-	private static final int ICE_INTERVAL = 4;
 
 	@Unique
 	private void shapesnsizes$holdGrowthInsideBlocks(Player self) {

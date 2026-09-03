@@ -40,7 +40,7 @@ public final class Trample {
 		World world = player.world;
 		if (world == null || world.isClientSide) return;
 		if (!PlayerScale.isBig(player) || !PlayerScale.sizeGriefing(world)) return;
-		if (treadsCarefully(player)) return;
+		if (treadsCarefully(player) || isIntangible(player)) return;
 		if (fallDistance <= PlayerScale.jumpHeight(player) * JUMP_MARGIN) return;
 
 		int y = footprintY(player);
@@ -87,6 +87,7 @@ public final class Trample {
 		World world = player.world;
 		if (world == null || world.isClientSide) return false;
 		if (!PlayerScale.isBig(player) || !PlayerScale.sizeGriefing(world)) return false;
+		if (isIntangible(player)) return false;
 
 		if (treadsCarefully(player)) return false;
 
@@ -153,9 +154,14 @@ public final class Trample {
 
 	public static boolean treadsHeavily(Player player) {
 		return PlayerScale.isBig(player)
+			&& !isIntangible(player)
 			&& !treadsCarefully(player)
 			&& !wearingLeatherBoots(player)
 			&& PlayerScale.sizeGriefing(player.world);
+	}
+
+	public static boolean isIntangible(Player player) {
+		return player.hasNoPhysics() || player.vehicle != null;
 	}
 
 	public static boolean treadsCarefully(Player player) {
@@ -214,12 +220,15 @@ public final class Trample {
 
 		if (!treadsHeavily(player) || wearingIceSkates(player)) return;
 
-		int minX = MathHelper.floor(player.bb.minX);
-		int maxX = MathHelper.floor(player.bb.maxX);
-		int minZ = MathHelper.floor(player.bb.minZ);
-		int maxZ = MathHelper.floor(player.bb.maxZ);
+		int minX = MathHelper.floor(player.bb.minX - ICE_MARGIN);
+		int maxX = MathHelper.floor(player.bb.maxX + ICE_MARGIN);
+		int minZ = MathHelper.floor(player.bb.minZ - ICE_MARGIN);
+		int maxZ = MathHelper.floor(player.bb.maxZ + ICE_MARGIN);
 		int minY = footprintY(player);
-		int maxY = Math.min(MathHelper.floor(player.bb.maxY), minY + MAX_ICE_HEIGHT);
+
+		int maxY = player.isInWater()
+			? Math.min(MathHelper.floor(player.bb.maxY), minY + MAX_ICE_HEIGHT)
+			: minY + 1;
 
 		boolean broke = false;
 		TilePos pos = new TilePos();
@@ -241,6 +250,8 @@ public final class Trample {
 	}
 
 	private static final int MAX_ICE_HEIGHT = 32;
+
+	private static final double ICE_MARGIN = 0.1;
 
 	public static boolean wearingIceSkates(Player player) {
 		ItemStack boots = player.getItemInArmorSlot(HumanArmorShape.BOOTS);
@@ -267,7 +278,7 @@ public final class Trample {
 	public static void crushCheck(Player self) {
 		World world = self.world;
 		if (world == null || world.isClientSide || !self.isAlive()) return;
-		if (!PlayerScale.sizeGriefing(world)) return;
+		if (!PlayerScale.sizeGriefing(world) || self.hasNoPhysics()) return;
 
 		List<Entity> nearby = world.getEntitiesWithinAABBExcludingEntity(self,
 			MathHelper.aabbGrow(self.bb, 0.2, 0.2, 0.2, new AABBd()));

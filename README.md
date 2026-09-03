@@ -12,7 +12,7 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 - Crops flatten under you. Snow takes a real footprint at each stride, one foot at a time,
   alternating sides, half your width across and rounded to whole blocks.
 - Ice breaks across every block your body touches, so falling through leaves a hole you can swim
-  out of instead of a lid over your head. Ice skates stop it.
+  out of instead of a lid over your head. Ice skates stop it, and so does noclip.
 - Grass turns to dirt where you land, but only from a genuine fall, further than you can jump.
 - From 3x, a hard landing kicks up a shockwave: one layer of dirt, sand, gravel or grass, about as
   wide as your stance and growing with the drop. Stone and anything built is left alone.
@@ -26,7 +26,8 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
   at 6x.
 - Boats and minecarts will not take a body past 2.5x. Climbing in breaks them, and so does growing
   while already sitting in one.
-- Crouching, crawling or leather boots spare all of the ground effects.
+- Crouching, crawling or leather boots spare all of the ground effects, and so does riding
+  something or flying through in noclip.
 
 ## Being small
 

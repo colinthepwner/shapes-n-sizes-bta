@@ -42,7 +42,8 @@ public final class Foliage {
 		if (world == null) return;
 		float scale = PlayerScale.get(player);
 		if (scale < WADE) return;
-		if (!moving(player)) return;
+		if (Trample.isIntangible(player)) return;
+		if (!stirring(player)) return;
 
 		boolean destroy = !world.isClientSide
 			&& scale >= BREAK_LEAVES
@@ -59,14 +60,32 @@ public final class Foliage {
 		if (player.yd < 0.0) player.yd *= 1.0 - (1.0 - keep) * 0.5;
 	}
 
-	private static boolean moving(Player player) {
+	private static boolean stirring(Player player) {
 		double dx = player.x - player.xo;
 		double dz = player.z - player.zo;
-		if (dx * dx + dz * dz > STIRRING * STIRRING) return true;
-		return player.yd < -STIRRING || player.yd > STIRRING;
+		boolean moved = dx * dx + dz * dz > STIRRING * STIRRING
+			|| player.yd < -STIRRING || player.yd > STIRRING;
+		if (!(player instanceof Walker)) return moved;
+		Walker walker = (Walker) player;
+		if (moved) {
+			walker.shapesnsizes$setCoasting(COASTING);
+			return true;
+		}
+		int left = walker.shapesnsizes$coasting();
+		if (left <= 0) return false;
+		walker.shapesnsizes$setCoasting(left - 1);
+		return true;
 	}
 
 	private static final double STIRRING = 0.01;
+
+	private static final int COASTING = 5;
+
+	public interface Walker {
+		int shapesnsizes$coasting();
+
+		void shapesnsizes$setCoasting(int ticks);
+	}
 
 	private static boolean sweep(Player player, World world, float scale, boolean destroy) {
 		int centreX = MathHelper.floor(player.x);
