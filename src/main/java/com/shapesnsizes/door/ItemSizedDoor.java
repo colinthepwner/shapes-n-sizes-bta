@@ -4,6 +4,7 @@ import net.minecraft.core.block.Block;
 import net.minecraft.core.block.support.PartialSupport;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.IPlaceable;
+import net.minecraft.core.enums.EnumBlockSoundEffectType;
 import net.minecraft.core.item.Item;
 import net.minecraft.core.item.ItemStack;
 import net.minecraft.core.util.helper.Direction;
@@ -73,6 +74,9 @@ public class ItemSizedDoor extends Item implements IPlaceable {
 			}
 			this.segments[i].onPlacedByWorld(world, positions[i]);
 		}
+
+		world.playBlockSoundEffect(player, blockPos.x() + 0.5, blockPos.y() + 0.5, blockPos.z() + 0.5,
+			this.segments[0], EnumBlockSoundEffectType.PLACE);
 		return true;
 	}
 

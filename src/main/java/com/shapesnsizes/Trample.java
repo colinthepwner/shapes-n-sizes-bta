@@ -176,8 +176,8 @@ public final class Trample {
 		World world = player.world;
 		if (world == null || world.isClientSide || !treadsHeavily(player)) return;
 
-		double dx = player.x - player.xo;
-		double dz = player.z - player.zo;
+		double dx = stepX(player);
+		double dz = stepZ(player);
 		double len = Math.sqrt(dx * dx + dz * dz);
 		if (len < 1.0e-4) {
 			dx = -Math.sin(player.yRot * Math.PI / 180.0);
@@ -323,10 +323,18 @@ public final class Trample {
 
 	private static boolean kickingInto(Entity mover, Entity target) {
 
-		double vx = mover.x - mover.xo;
-		double vz = mover.z - mover.zo;
+		double vx = stepX(mover);
+		double vz = stepZ(mover);
 		if (vx * vx + vz * vz < KICK_SPEED * KICK_SPEED) return false;
 		return vx * (target.x - mover.x) + vz * (target.z - mover.z) > 0.0;
+	}
+
+	private static double stepX(Entity entity) {
+		return entity instanceof SizeTicker ? ((SizeTicker) entity).shapesnsizes$stepX() : entity.x - entity.xo;
+	}
+
+	private static double stepZ(Entity entity) {
+		return entity instanceof SizeTicker ? ((SizeTicker) entity).shapesnsizes$stepZ() : entity.z - entity.zo;
 	}
 
 	private static int crushDamage(float ratio) {

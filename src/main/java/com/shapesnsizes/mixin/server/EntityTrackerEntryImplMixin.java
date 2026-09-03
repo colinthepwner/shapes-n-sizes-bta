@@ -1,8 +1,8 @@
 package com.shapesnsizes.mixin.server;
 
+import com.shapesnsizes.PlayerScale;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.net.packet.PacketSetEntityData;
 import net.minecraft.server.entity.EntityTrackerEntryImpl;
 import net.minecraft.server.entity.player.PlayerServer;
 import org.spongepowered.asm.mixin.Mixin;
@@ -23,15 +23,9 @@ public class EntityTrackerEntryImplMixin {
 	)
 	private boolean shapesnsizes$sendSizeOnFirstSight(Set<PlayerServer> watchers, Object watcher) {
 		boolean added = watchers.add((PlayerServer) watcher);
-		if (added && this.trackedEntity instanceof Player && watcher instanceof PlayerServer) {
-			PlayerServer viewer = (PlayerServer) watcher;
-			if (viewer.playerNetServerHandler != null) {
-
-				viewer.playerNetServerHandler.sendPacket(
-					new PacketSetEntityData(this.trackedEntity.id, this.trackedEntity.getEntityData()));
-			}
+		if (added && this.trackedEntity instanceof Player) {
+			PlayerScale.forceResync((Player) this.trackedEntity);
 		}
 		return added;
 	}
-
 }

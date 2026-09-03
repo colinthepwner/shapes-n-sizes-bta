@@ -23,7 +23,10 @@ public final class Foliage {
 	private static final double BASE_KEEP = 0.35;
 
 	private static final int MAX_HALF_WIDTH = 8;
-	private static final int MAX_HEIGHT = 32;
+
+	private static final int MAX_HEIGHT = 16;
+
+	private static final int SWEEP_INTERVAL = 3;
 
 	private Foliage() {}
 
@@ -51,7 +54,23 @@ public final class Foliage {
 			&& !Trample.treadsCarefully(player)
 			&& !Behemoth.wearingSoftBoots(player);
 
-		if (!sweep(player, world, scale, destroy)) return;
+		State state = player instanceof Walker ? ((Walker) player).shapesnsizes$foliageState() : null;
+		if (state != null && --state.countdown > 0) return;
+		if (state != null) state.countdown = SWEEP_INTERVAL;
+
+		double backX = 0.0;
+		double backZ = 0.0;
+		if (state != null && state.swept) {
+			backX = player.x - state.sweptX;
+			backZ = player.z - state.sweptZ;
+		}
+		if (state != null) {
+			state.sweptX = player.x;
+			state.sweptZ = player.z;
+			state.swept = true;
+		}
+
+		if (!sweep(player, world, scale, destroy, backX, backZ)) return;
 
 		double keep = leafDrag(player);
 		player.xd *= keep;
@@ -61,19 +80,18 @@ public final class Foliage {
 	}
 
 	private static boolean stirring(Player player) {
-		double dx = player.x - player.xo;
-		double dz = player.z - player.zo;
-		boolean moved = dx * dx + dz * dz > STIRRING * STIRRING
-			|| player.yd < -STIRRING || player.yd > STIRRING;
+		double step = player instanceof SizeTicker
+			? ((SizeTicker) player).shapesnsizes$stepLength()
+			: Math.hypot(player.x - player.xo, player.z - player.zo);
+		boolean moved = step > STIRRING || player.yd < -STIRRING || player.yd > STIRRING;
 		if (!(player instanceof Walker)) return moved;
-		Walker walker = (Walker) player;
+		State state = ((Walker) player).shapesnsizes$foliageState();
 		if (moved) {
-			walker.shapesnsizes$setCoasting(COASTING);
+			state.coasting = COASTING;
 			return true;
 		}
-		int left = walker.shapesnsizes$coasting();
-		if (left <= 0) return false;
-		walker.shapesnsizes$setCoasting(left - 1);
+		if (state.coasting <= 0) return false;
+		--state.coasting;
 		return true;
 	}
 
@@ -81,19 +99,35 @@ public final class Foliage {
 
 	private static final int COASTING = 5;
 
-	public interface Walker {
-		int shapesnsizes$coasting();
+	public static final class State {
 
-		void shapesnsizes$setCoasting(int ticks);
+		int coasting;
+
+		int countdown;
+
+		double sweptX;
+		double sweptZ;
+		boolean swept;
 	}
 
-	private static boolean sweep(Player player, World world, float scale, boolean destroy) {
+	public interface Walker {
+		State shapesnsizes$foliageState();
+	}
+
+	private static boolean sweep(Player player, World world, float scale, boolean destroy,
+			double backX, double backZ) {
+
+		double loX = Math.min(player.bb.minX, player.bb.minX - backX);
+		double hiX = Math.max(player.bb.maxX, player.bb.maxX - backX);
+		double loZ = Math.min(player.bb.minZ, player.bb.minZ - backZ);
+		double hiZ = Math.max(player.bb.maxZ, player.bb.maxZ - backZ);
+
 		int centreX = MathHelper.floor(player.x);
 		int centreZ = MathHelper.floor(player.z);
-		int minX = Math.max(MathHelper.floor(player.bb.minX), centreX - MAX_HALF_WIDTH);
-		int maxX = Math.min(MathHelper.floor(player.bb.maxX), centreX + MAX_HALF_WIDTH);
-		int minZ = Math.max(MathHelper.floor(player.bb.minZ), centreZ - MAX_HALF_WIDTH);
-		int maxZ = Math.min(MathHelper.floor(player.bb.maxZ), centreZ + MAX_HALF_WIDTH);
+		int minX = Math.max(MathHelper.floor(loX), centreX - MAX_HALF_WIDTH);
+		int maxX = Math.min(MathHelper.floor(hiX), centreX + MAX_HALF_WIDTH);
+		int minZ = Math.max(MathHelper.floor(loZ), centreZ - MAX_HALF_WIDTH);
+		int maxZ = Math.min(MathHelper.floor(hiZ), centreZ + MAX_HALF_WIDTH);
 		int minY = MathHelper.floor(player.bb.minY);
 		int maxY = Math.min(MathHelper.floor(player.bb.maxY), minY + MAX_HEIGHT);
 

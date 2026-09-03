@@ -42,16 +42,20 @@ public abstract class BlockLogicDoorMixin {
 	}
 
 	@Unique
+	private static int placementFacing(int data) {
+		return (data & MASK_HINGE) != 0 ? (((data & MASK_ROTATION) + 1) & MASK_ROTATION) : (data & MASK_ROTATION);
+	}
+
+	@Unique
 	private void shapesnsizes$matchPartner(World world, TilePosc tilePos) {
 		BlockLogicDoor self = (BlockLogicDoor) (Object) this;
 		if (self.getMaterial() == Materials.METAL || self.getMaterial() == Materials.STEEL) return;
 
 		int data = world.getBlockData(tilePos);
 		boolean open = BlockLogicDoor.isOpen(data);
+		int facing = placementFacing(data);
 
-		int rotation = data & MASK_ROTATION;
-
-		boolean alongX = rotation == 0 || rotation == 2;
+		boolean alongX = facing == 0 || facing == 2;
 		TilePos beside = new TilePos();
 		TilePos above = new TilePos();
 
@@ -61,7 +65,7 @@ public abstract class BlockLogicDoorMixin {
 			if (partner == null || partner.isTop) continue;
 
 			int partnerData = world.getBlockData(beside);
-			if ((partnerData & MASK_ROTATION) != rotation) continue;
+			if (placementFacing(partnerData) != facing) continue;
 
 			if (((partnerData ^ data) & MASK_HINGE) == 0) continue;
 

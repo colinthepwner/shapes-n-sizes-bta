@@ -46,6 +46,21 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 	@Unique
 	private long shapesnsizes$lastSizeTick = -1L;
 
+	@Unique private double shapesnsizes$seenX = Double.NaN;
+	@Unique private double shapesnsizes$seenZ = Double.NaN;
+	@Unique private double shapesnsizes$stepX = 0.0;
+	@Unique private double shapesnsizes$stepZ = 0.0;
+
+	@Override
+	public double shapesnsizes$stepX() {
+		return this.shapesnsizes$stepX;
+	}
+
+	@Override
+	public double shapesnsizes$stepZ() {
+		return this.shapesnsizes$stepZ;
+	}
+
 	@Unique
 	private int shapesnsizes$crushTimer = 0;
 
@@ -80,16 +95,11 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 	private float shapesnsizes$boxScale = -1.0f;
 
 	@Unique
-	private int shapesnsizes$coasting = 0;
+	private final Foliage.State shapesnsizes$foliage = new Foliage.State();
 
 	@Override
-	public int shapesnsizes$coasting() {
-		return this.shapesnsizes$coasting;
-	}
-
-	@Override
-	public void shapesnsizes$setCoasting(int ticks) {
-		this.shapesnsizes$coasting = ticks;
+	public Foliage.State shapesnsizes$foliageState() {
+		return this.shapesnsizes$foliage;
 	}
 
 	@Unique
@@ -175,8 +185,20 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 		if (now == this.shapesnsizes$lastSizeTick) return;
 		this.shapesnsizes$lastSizeTick = now;
 
+		if (Double.isNaN(this.shapesnsizes$seenX)) {
+			this.shapesnsizes$stepX = 0.0;
+			this.shapesnsizes$stepZ = 0.0;
+		} else {
+			this.shapesnsizes$stepX = this.x - this.shapesnsizes$seenX;
+			this.shapesnsizes$stepZ = this.z - this.shapesnsizes$seenZ;
+		}
+		this.shapesnsizes$seenX = this.x;
+		this.shapesnsizes$seenZ = this.z;
+
 		PlayerScale.tickEase(self);
 		shapesnsizes$holdGrowthInsideBlocks(self);
+
+		PlayerScale.publishEase(self);
 		shapesnsizes$footfalls(self);
 		float f = PlayerScale.speedFactor(self);
 		if (f != 1.0f) {
@@ -277,9 +299,7 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 			return;
 		}
 		if (!this.onGround) return;
-		double dx = this.x - this.xo;
-		double dz = this.z - this.zo;
-		double travelled = Math.sqrt(dx * dx + dz * dz);
+		double travelled = this.shapesnsizes$stepLength();
 		if (travelled > 0.0) {
 
 			Trample.crushCrops(self);

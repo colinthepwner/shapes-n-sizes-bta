@@ -17,6 +17,7 @@ public final class PlayerScale {
 	public static final int BROKEN_ID = 21;
 	public static final int CRAWL_ID = 22;
 	public static final int BONUS_ID = 23;
+	public static final int EASED_ID = 24;
 	public static final String TAG = "ShapesScale";
 	public static final String BONUS_TAG = "ShapesBonus";
 	public static final float MIN = 0.1f;
@@ -33,6 +34,8 @@ public final class PlayerScale {
 		data.define(BROKEN_ID, (byte) 0, Byte.class);
 		data.define(CRAWL_ID, (byte) 0, Byte.class);
 		data.define(BONUS_ID, 0, Integer.class);
+
+		data.define(EASED_ID, -1, Integer.class);
 	}
 
 	public static final float CRAWL_HEIGHT = 0.6f;
@@ -63,12 +66,20 @@ public final class PlayerScale {
 
 	public static float get(Player player) {
 		if (player == null) return DEFAULT;
-		if (player instanceof ScaledPlayer) {
-			float eased = ((ScaledPlayer) player).shapesnsizes$easedScale();
+		float eased = easedNow(player);
 
-			if (eased >= 0.0f) return eased;
+		return eased >= 0.0f ? eased : target(player);
+	}
+
+	private static float easedNow(Player player) {
+		if (player.world != null && player.world.isClientSide) {
+			try {
+				return player.getEntityData().getInt(EASED_ID) / 1000.0f;
+			} catch (RuntimeException e) {
+				return -1.0f;
+			}
 		}
-		return target(player);
+		return player instanceof ScaledPlayer ? ((ScaledPlayer) player).shapesnsizes$easedScale() : -1.0f;
 	}
 
 	public static float target(Player player) {
@@ -78,6 +89,8 @@ public final class PlayerScale {
 
 	public static void tickEase(Player player) {
 		if (!(player instanceof ScaledPlayer)) return;
+
+		if (player.world != null && player.world.isClientSide) return;
 		ScaledPlayer scaled = (ScaledPlayer) player;
 		float goal = target(player);
 		float eased = scaled.shapesnsizes$easedScale();
@@ -92,9 +105,21 @@ public final class PlayerScale {
 		scaled.shapesnsizes$setEasedScale(eased + (goal - eased) * EASE_RATE);
 	}
 
+	public static void publishEase(Player player) {
+		if (player == null || !(player instanceof ScaledPlayer)) return;
+		if (player.world != null && player.world.isClientSide) return;
+		float eased = ((ScaledPlayer) player).shapesnsizes$easedScale();
+		try {
+			player.getEntityData().set(EASED_ID, Math.round(eased * 1000.0f));
+		} catch (RuntimeException ignored) {
+		}
+	}
+
 	public static void snapEase(Player player) {
 		if (player instanceof ScaledPlayer) {
-			((ScaledPlayer) player).shapesnsizes$setEasedScale(target(player));
+			float goal = target(player);
+			((ScaledPlayer) player).shapesnsizes$setEasedScale(goal);
+			publishEase(player);
 		}
 	}
 
@@ -208,6 +233,10 @@ public final class PlayerScale {
 		int bonus = data.getInt(BONUS_ID);
 		data.set(BONUS_ID, bonus == 0 ? 1 : 0);
 		data.set(BONUS_ID, bonus);
+
+		int eased = data.getInt(EASED_ID);
+		data.set(EASED_ID, eased == 0 ? 1 : 0);
+		data.set(EASED_ID, eased);
 	}
 
 	public static int abilityPercent(Player player) {

@@ -156,17 +156,17 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 
 	private void swingPartner(World world, TilePosc tilePos, int data) {
 
-		int rotation = this.getRotation(data);
+		int facing = placementFacing(data);
 		boolean open = isOpenFor(data ^ MASK_OPENED);
 
-		boolean alongX = rotation == 0 || rotation == 2;
+		boolean alongX = facing == 0 || facing == 2;
 		for (int step = -1; step <= 1; step += 2) {
 			TilePos beside = new TilePos(
 				tilePos.x() + (alongX ? step : 0), tilePos.y(), tilePos.z() + (alongX ? 0 : step));
 			BlockLogicSizedDoor partner = world.getBlockLogic(beside, BlockLogicSizedDoor.class);
 			if (partner == null || partner.height != this.height || partner.index != 0) continue;
 			int partnerData = world.getBlockData(beside);
-			if (partner.getRotation(partnerData) != rotation) continue;
+			if (placementFacing(partnerData) != facing) continue;
 			if (((partnerData ^ data) & MASK_HINGE) == 0) continue;
 
 			if (isOpenFor(partnerData) == open) return;
@@ -175,6 +175,12 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 			return;
 		}
 	}
+
+	private static int placementFacing(int data) {
+		return (data & MASK_HINGE) != 0 ? (((data & MASK_FACING) + 1) & MASK_FACING) : (data & MASK_FACING);
+	}
+
+	private static final int MASK_FACING = 3;
 
 	private static boolean isOpenFor(int data) {
 		return ((data & MASK_OPENED) != 0) != ((data & MASK_HINGE) != 0);
