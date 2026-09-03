@@ -15,6 +15,16 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 public class WorldRendererMixin {
 	@Shadow public Minecraft mc;
 
+	@ModifyConstant(method = "getProjectionMatrix", constant = @Constant(floatValue = 0.05f))
+	private float shapesnsizes$nearPlaneForProjection(float near) {
+		return PlayerScale.nearPlane(this.mc == null ? null : this.mc.thePlayer);
+	}
+
+	@ModifyConstant(method = "renderWorld", constant = @Constant(floatValue = 0.05f))
+	private float shapesnsizes$nearPlaneForWorld(float near) {
+		return PlayerScale.nearPlane(this.mc == null ? null : this.mc.thePlayer);
+	}
+
 	@Redirect(
 		method = "getMouseOver",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/player/gamemode/Gamemode;getBlockReachDistance()F")

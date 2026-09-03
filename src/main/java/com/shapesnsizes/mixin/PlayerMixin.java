@@ -10,6 +10,7 @@ import com.shapesnsizes.PortalSized;
 import com.shapesnsizes.PortalSizes;
 import com.shapesnsizes.Ridable;
 import com.shapesnsizes.ScaledPlayer;
+import com.shapesnsizes.SizeTicker;
 import com.shapesnsizes.Trample;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.material.Materials;
@@ -34,13 +35,16 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(value = Player.class, remap = false)
-public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSized, Wading.Wader, Foliage.Walker {
+public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSized, Wading.Wader, Foliage.Walker, SizeTicker {
 	protected PlayerMixin(World world) {
 		super(world);
 	}
 
 	@Unique
 	private boolean shapesnsizes$jumpedSinceSupported = false;
+
+	@Unique
+	private long shapesnsizes$lastSizeTick = -1L;
 
 	@Unique
 	private int shapesnsizes$crushTimer = 0;
@@ -160,7 +164,16 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 
 	@Inject(method = "onLivingUpdate", at = @At("TAIL"))
 	private void shapesnsizes$scaleSpeed(CallbackInfo ci) {
+		this.shapesnsizes$sizeTick();
+	}
+
+	@Override
+	public void shapesnsizes$sizeTick() {
 		Player self = (Player) (Object) this;
+
+		long now = this.world == null ? 0L : this.world.getTotalWorldTime();
+		if (now == this.shapesnsizes$lastSizeTick) return;
+		this.shapesnsizes$lastSizeTick = now;
 
 		PlayerScale.tickEase(self);
 		shapesnsizes$holdGrowthInsideBlocks(self);

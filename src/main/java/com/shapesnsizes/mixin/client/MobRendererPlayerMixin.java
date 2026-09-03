@@ -70,6 +70,45 @@ public class MobRendererPlayerMixin {
 	}
 
 	@Inject(
+		method = "setupAnimations(Lnet/minecraft/core/entity/player/Player;Lorg/useless/dragonfly/models/entity/StaticEntityModel;FI)Lorg/useless/dragonfly/models/entity/StaticEntityModel;",
+		at = @At("RETURN")
+	)
+	private void shapesnsizes$glidePose(Player entity, StaticEntityModel model, float partialTick, int layer,
+			CallbackInfoReturnable<StaticEntityModel> cir) {
+		StaticEntityModel posed = cir.getReturnValue();
+		if (posed == null || entity == null) return;
+		if (entity.onGround || entity.isPlayerSleeping() || PlayerScale.isCrawling(entity)) return;
+		if (!PlayerScale.isGliding(entity)) return;
+
+		double roll = Math.sin((entity.tickCount + partialTick) * GLIDE_ROLL_RATE) * GLIDE_ROLL;
+
+		BoneTransform right = posed.getTransform("rightArm");
+		if (right != null) {
+			right.rotX = -GLIDE_ARM_FORWARD;
+			right.rotZ = -GLIDE_ARM_SPREAD + roll;
+		}
+		BoneTransform left = posed.getTransform("leftArm");
+		if (left != null) {
+			left.rotX = -GLIDE_ARM_FORWARD;
+			left.rotZ = GLIDE_ARM_SPREAD + roll;
+		}
+
+		BoneTransform rightLeg = posed.getTransform("rightLeg");
+		if (rightLeg != null) rightLeg.rotX = GLIDE_LEG_TRAIL;
+		BoneTransform leftLeg = posed.getTransform("leftLeg");
+		if (leftLeg != null) leftLeg.rotX = GLIDE_LEG_TRAIL;
+	}
+
+	@Unique private static final double GLIDE_ARM_SPREAD = Math.toRadians(75.0);
+
+	@Unique private static final double GLIDE_ARM_FORWARD = Math.toRadians(20.0);
+
+	@Unique private static final double GLIDE_LEG_TRAIL = Math.toRadians(12.0);
+
+	@Unique private static final double GLIDE_ROLL = Math.toRadians(7.0);
+	@Unique private static final double GLIDE_ROLL_RATE = 0.12;
+
+	@Inject(
 		method = "getShadowSize(Lnet/minecraft/core/entity/player/Player;)F",
 		at = @At("RETURN"),
 		cancellable = true

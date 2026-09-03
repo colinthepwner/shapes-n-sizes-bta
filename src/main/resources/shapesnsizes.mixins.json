@@ -30,6 +30,7 @@
     "BlockLogicBoulderMagmaticMixin",
     "BlockLogicBoulderSulfuricMixin",
     "MobCreeperMixin",
+    "MobPathfinderMixin",
     "EntityBoatMixin",
     "EntityMinecartMixin",
     "PortalHandlerMixin"
@@ -53,6 +54,7 @@
   ],
   "server": [
     "server.PacketHandlerServerMixin",
+    "server.PlayerServerMixin",
     "server.PlayerListMixin",
     "server.EntityTrackerEntryImplMixin"
   ],

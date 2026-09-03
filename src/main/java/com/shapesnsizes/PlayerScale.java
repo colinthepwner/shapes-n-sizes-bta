@@ -302,6 +302,24 @@ public final class PlayerScale {
 		return Math.max(1, Math.round(damage / MathHelper.clamp(f, 1.0f / MAX_DAMAGE_RELIEF, MAX_DAMAGE_RELIEF)));
 	}
 
+	public static double presence(Player player) {
+		float weight = abilityFactor(player);
+		if (weight == 1.0f) return 1.0;
+		return MathHelper.clamp(Math.sqrt(weight), PRESENCE_FLOOR, PRESENCE_CEILING);
+	}
+
+	private static final double PRESENCE_FLOOR = 0.6;
+
+	private static final double PRESENCE_CEILING = 3.0;
+
+	public static float nearPlane(Player player) {
+		float scale = player == null ? DEFAULT : get(player);
+		return Math.max(MIN_NEAR_PLANE, VANILLA_NEAR_PLANE * Math.min(1.0f, scale));
+	}
+
+	private static final float VANILLA_NEAR_PLANE = 0.05f;
+	private static final float MIN_NEAR_PLANE = 0.01f;
+
 	private static final float MAX_DAMAGE_RELIEF = 4.0f;
 
 	public static float breathFactor(Player player) {

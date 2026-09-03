@@ -10,18 +10,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 @Mixin(value = World.class, remap = false)
 public class WorldTargetingMixin {
 
-	private static final double FLOOR = 0.6;
-	private static final double CEILING = 3.0;
-
 	@Redirect(
 		method = "getClosestPlayer",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/player/Player;distanceToSqr(DDD)D")
 	)
 	private double shapesnsizes$noticeTheBigOnes(Player player, double x, double y, double z) {
 		double distanceSqr = player.distanceToSqr(x, y, z);
-		float weight = PlayerScale.abilityFactor(player);
-		if (weight == 1.0f) return distanceSqr;
-		double presence = Math.max(FLOOR, Math.min(CEILING, Math.sqrt(weight)));
+		double presence = PlayerScale.presence(player);
+		if (presence == 1.0) return distanceSqr;
+
 		return distanceSqr / (presence * presence);
 	}
 }
