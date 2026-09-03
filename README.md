@@ -32,7 +32,7 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 ## Being small
 
 - You never trample farmland, and monsters overlook you in favour of whoever is standing behind you.
-- Hold a lily pad to walk on water. Sneaking, jumping onto it or taking a hit drops you through,
+- Hold algae to walk on water. Sneaking, jumping onto it or taking a hit drops you through,
   and you have to reach dry land before it will hold you again.
 - Hold paper to glide down slowly and land unhurt from any height.
 - At half size or under you climb sheer walls, either by crouching against one or by holding a

@@ -27,7 +27,7 @@ import org.useless.dragonfly.models.entity.StaticEntityModel;
 
 @Mixin(value = MobRendererPlayer.class, remap = false)
 public class MobRendererPlayerMixin {
-	@Unique private BlocksContainer shapesnsizes$padContainer = null;
+	@Unique private BlocksContainer shapesnsizes$algaeContainer = null;
 
 	@Inject(
 		method = "preRenderTransform(Lnet/minecraft/core/entity/player/Player;DDDFF)V",
@@ -136,13 +136,13 @@ public class MobRendererPlayerMixin {
 		method = "renderSpecials(Lnet/minecraft/client/render/tessellator/TessellatorGeneral;Lnet/minecraft/core/entity/player/Player;DDD)V",
 		at = @At("HEAD")
 	)
-	private void shapesnsizes$drawLilyPad(TessellatorGeneral tessellator, Player player, double x, double y, double z, CallbackInfo ci) {
+	private void shapesnsizes$drawAlgae(TessellatorGeneral tessellator, Player player, double x, double y, double z, CallbackInfo ci) {
 		if (!PlayerScale.canWaterWalk(player) || player.world == null) return;
 		if (PlayerScale.waterUnderfoot(player) == null) return;
-		if (this.shapesnsizes$padContainer == null || this.shapesnsizes$padContainer.world != player.world) {
-			this.shapesnsizes$padContainer = new BlocksContainer(player.world);
+		if (this.shapesnsizes$algaeContainer == null || this.shapesnsizes$algaeContainer.world != player.world) {
+			this.shapesnsizes$algaeContainer = new BlocksContainer(player.world);
 		}
-		BlocksContainer container = this.shapesnsizes$padContainer;
+		BlocksContainer container = this.shapesnsizes$algaeContainer;
 
 		GLRenderer.pushFrame();
 		GLRenderer.setColor4f(1.0f, 1.0f, 1.0f, 1.0f);
