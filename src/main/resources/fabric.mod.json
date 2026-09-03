@@ -1,0 +1,36 @@
+{
+	"schemaVersion": 1,
+	"id": "shapesnsizes",
+	"version": "${version}",
+	"name": "Shapes n Sizes",
+	"description": "Scale players up or down with /scaling. Hitbox, eye height, model, reach, speed and jump follow the new size, with the ability scaling adjustable.",
+	"authors": [
+		"colin"
+	],
+	"contact": {
+		"homepage": "",
+		"sources": ""
+	},
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.shapesnsizes.ShapesNSizes"
+		],
+		"client": [
+			"com.shapesnsizes.client.ShapesNSizesClient"
+		]
+	},
+	"mixins": [
+		"shapesnsizes.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=${fabricloader}",
+		"halplibe": ">=${halplibe}",
+		"minecraft": "*",
+		"java": ">=${java}"
+	},
+	"suggests": {
+		"modmenu": ">=${modmenu}"
+	}
+}

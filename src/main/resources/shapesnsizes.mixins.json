@@ -1,0 +1,62 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.shapesnsizes.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "MobMixin",
+    "EntityMixin",
+    "PlayerMixin",
+    "ItemBucketMixin",
+    "BlockLogicFarmlandMixin",
+    "BlockLogicIceMixin",
+    "SlotArmorMixin",
+    "BlockLogicSoulSandMixin",
+    "BlockLogicSoulCatcherMixin",
+    "BlockLogicLayerSnowMixin",
+    "ConsumedFoodMixin",
+    "BlockLogicTallGrassMixin",
+    "BlockLogicCactusMixin",
+    "BlockLogicEdibleMixin",
+    "BlockLogicFlowerStackableMixin",
+    "BlockLogicPortalMixin",
+    "BlockLogicPressurePlateMixin",
+    "BlockLogicPistonBaseMixin",
+    "WorldTargetingMixin",
+    "WorldFixtureCollisionMixin",
+    "BlockLogicDoorMixin",
+    "BlockLogicMagmaMixin",
+    "BlockLogicBrimthawMixin",
+    "BlockLogicBoulderMagmaticMixin",
+    "BlockLogicBoulderSulfuricMixin",
+    "MobCreeperMixin",
+    "EntityBoatMixin",
+    "EntityMinecartMixin",
+    "PortalHandlerMixin"
+  ],
+  "client": [
+    "client.MinecraftMixin",
+    "client.PlayerLocalMixin",
+    "client.PlayerLocalInvoker",
+    "client.WorldRendererMixin",
+    "client.MobRendererBipedMixin",
+    "client.MobRendererPlayerMixin",
+    "client.ItemModelMixin",
+    "client.ItemRendererMixin",
+    "client.PlayerInputMixin",
+    "client.EntityCameraThirdPersonRearMixin",
+    "client.ParticleEngineMixin",
+    "client.HudComponentHealthBarMixin",
+    "client.HudComponentOxygenBarMixin",
+    "client.EntityRendererDispatcherMixin",
+    "client.EntityRendererMixin"
+  ],
+  "server": [
+    "server.PacketHandlerServerMixin",
+    "server.PlayerListMixin",
+    "server.EntityTrackerEntryImplMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

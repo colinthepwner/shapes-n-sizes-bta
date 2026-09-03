@@ -1,0 +1,8 @@
+gamerule.ability_scaling.name=Ability Scaling
+gamerule.ability_scaling.desc=How much of a size change carries over to speed, reach and jump, in percent. 100 makes a 2x player move, reach and jump 2x as far; 0 changes only the body.
+gamerule.do_size_griefing.name=Size Griefing
+gamerule.do_size_griefing.desc=If enabled, size affects the world: big players trample farmland, crack ice, flatten grass where they land and wreck snow layers, small players never trample farmland, and a big enough body can tread on a small enough one.
+gamerule.do_size_stomp_sounds.name=Size Stomp Sounds
+gamerule.do_size_stomp_sounds.desc=If enabled, a very large player's footfalls are loud enough to hear across a valley. Off by default: the noise is a fine entrance and tiresome by the hundredth step.
+gamerule.do_size_water_displacement.name=Size Water Displacement
+gamerule.do_size_water_displacement.desc=If enabled, a very large player parts shallow water as they wade through it. Its own setting because it moves blocks every tick a giant is in the water, which a busy server may not want to pay for.
