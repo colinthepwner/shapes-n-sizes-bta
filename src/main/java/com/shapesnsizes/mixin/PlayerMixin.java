@@ -478,13 +478,22 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 		double sink = RIDE_SINK * scale;
 
 		if (this.vehicle instanceof Entity) {
-			sink = Math.min(sink, Math.max(RIDE_SINK, ((Entity) this.vehicle).bbHeight));
+			Entity mount = (Entity) this.vehicle;
+			sink = Math.min(sink, Math.max(RIDE_SINK, mount.bbHeight));
+			if (mount instanceof Mob) {
+
+				double hipsOnBack = mount.getRideHeight() + LEG_FRACTION * self.bbHeight - mount.bbHeight;
+				sink = Math.min(sink, hipsOnBack);
+			}
 		}
 		cir.setReturnValue(this.heightOffset - sink);
 	}
 
 	@Unique
 	private static final double RIDE_SINK = 0.5;
+
+	@Unique
+	private static final double LEG_FRACTION = 0.4;
 
 	@ModifyVariable(method = "causeFallDamage", at = @At("HEAD"), argsOnly = true)
 	private float shapesnsizes$scaleFall(float distance) {

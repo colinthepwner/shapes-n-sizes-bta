@@ -1,6 +1,9 @@
 package com.shapesnsizes.mixin;
 
 import com.shapesnsizes.PlayerScale;
+import net.minecraft.core.block.Block;
+import net.minecraft.core.block.Blocks;
+import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.Mob;
 import net.minecraft.core.util.helper.MathHelper;
@@ -44,6 +47,18 @@ public abstract class MobMixin {
 	private boolean shapesnsizes$rainCountsAsWater(Mob self) {
 		if (self.isUnderAcidOrWater()) return true;
 		return self instanceof Player && PlayerScale.drowningInRain((Player) self);
+	}
+
+	@Redirect(
+		method = "moveEntityWithHeading",
+		at = @At(value = "FIELD", target = "Lnet/minecraft/core/block/Block;friction:F", opcode = Opcodes.GETFIELD)
+	)
+	private float shapesnsizes$slickSurfaceTension(Block<?> block) {
+		Mob self = (Mob) (Object) this;
+		if (self instanceof Player && block.hasTag(BlockTags.IS_WATER) && PlayerScale.canWaterWalk((Player) self)) {
+			return Blocks.ICE.friction;
+		}
+		return block.friction;
 	}
 
 	@ModifyConstant(method = "moveEntityWithHeading", constant = @Constant(doubleValue = 0.25))

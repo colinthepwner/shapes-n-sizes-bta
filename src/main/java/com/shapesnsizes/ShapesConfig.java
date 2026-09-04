@@ -12,6 +12,9 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Random;
+
+import net.minecraft.core.net.PropertyManager;
 
 public final class ShapesConfig {
 	private static final String FILE_NAME = "shapesnsizes.properties";
@@ -21,12 +24,53 @@ public final class ShapesConfig {
 	private static final Map<String, Float> PLAYER_SCALES = new HashMap<>();
 	private static float defaultScale = PlayerScale.DEFAULT;
 
+	public static final String SERVER_PROPERTY = "starting-size";
+	private static final String SERVER_PROPERTY_DEFAULT = "1";
+	private static final String SERVER_PROPERTY_RANDOM = "random";
+
+	private static float serverFixed = PlayerScale.DEFAULT;
+	private static boolean serverRandom = false;
+
 	private ShapesConfig() {}
 
 	public static float startingScale(String username) {
 		if (username == null) return defaultScale;
 		Float named = PLAYER_SCALES.get(username.toLowerCase(Locale.ROOT));
 		return named == null ? defaultScale : named;
+	}
+
+	public static Float namedScale(String username) {
+		return username == null ? null : PLAYER_SCALES.get(username.toLowerCase(Locale.ROOT));
+	}
+
+	public static void loadServerProperty(PropertyManager properties) {
+		serverFixed = PlayerScale.DEFAULT;
+		serverRandom = false;
+		String raw = properties.getStringProperty(SERVER_PROPERTY, SERVER_PROPERTY_DEFAULT).trim();
+		if (raw.equalsIgnoreCase(SERVER_PROPERTY_RANDOM)) {
+			serverRandom = true;
+			ShapesNSizes.LOGGER.info("server.properties: new players start at a random size, {}x to {}x.",
+				PlayerScale.format(StartingSize.RANDOM_MIN), PlayerScale.format(StartingSize.RANDOM_MAX));
+			return;
+		}
+		try {
+			serverFixed = PlayerScale.clamp(Float.parseFloat(raw));
+		} catch (NumberFormatException e) {
+			ShapesNSizes.LOGGER.warn("server.properties: {}='{}' is not a number or 'random'; new players start at normal size.",
+				SERVER_PROPERTY, raw);
+			return;
+		}
+		if (serverFixed != PlayerScale.DEFAULT) {
+			ShapesNSizes.LOGGER.info("server.properties: new players start at {}x.", PlayerScale.format(serverFixed));
+		}
+	}
+
+	public static boolean serverIsRandom() {
+		return serverRandom;
+	}
+
+	public static float serverStartingScale(Random random) {
+		return serverRandom ? StartingSize.RANDOM.pick(random) : serverFixed;
 	}
 
 	public static boolean hasAnything() {

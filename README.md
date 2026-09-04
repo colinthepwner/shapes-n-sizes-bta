@@ -32,8 +32,9 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 ## Being small
 
 - You never trample farmland, and monsters overlook you in favour of whoever is standing behind you.
-- Hold algae to walk on water. Sneaking, jumping onto it or taking a hit drops you through,
-  and you have to reach dry land before it will hold you again.
+- Hold algae to walk on water. The surface is as slippery as ice while it holds. Sneaking,
+  jumping onto it or taking a hit drops you through, and you have to reach dry land before it
+  will hold you again.
 - Placed algae holds you up too, from half size, so a line of it is a bridge.
 - Hold paper to glide down slowly and land unhurt from any height.
 - At half size or under you climb sheer walls, either by crouching against one or by holding a
@@ -48,8 +49,8 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 ## Either way
 
 - Fall damage goes both ways from normal size. A big body is measured in body lengths, so a 2x
-  player falls twice as far unhurt. A small body is charged by the square of its size, which is why
-  a mouse walks away from a fall that kills a horse.
+  player falls twice as far unhurt. A small body is charged by its size, so a half-size player
+  takes half the damage and a mouse walks away from a fall that kills a horse.
 - Gravity does not scale. Two players of different sizes who step off the same ledge land together.
 - A rider sits at a depth that follows their size, so a giant on a pig straddles it rather than
   hovering over it. A tall player asleep in a bed lies down the bed with their head on the pillow
@@ -112,14 +113,17 @@ Operator only. `/scale` and `/scaling` are the same command under two names, the
 
 ## Game rules
 
-All four appear in the world settings screen and can be set with `/gamerule`.
+All of them can be set with `/gamerule`. The on/off rules and the starting size also appear in the
+world settings screen when a world is created.
 
 | Rule | Default | What it does |
 | --- | --- | --- |
 | `abilityScaling` | `100` | How much of a size change carries over to speed, reach and jump. `100` is fully proportional, `0` changes only the body. |
 | `doSizeGriefing` | `true` | Whether size changes trampling, footprints, ice and woodland. |
+| `sizeTramplePlayers` | `true` | Whether a big enough body can tread on a small enough player. Mobs underfoot are covered by `doSizeGriefing`. |
 | `doSizeStompSounds` | `false` | Whether a very large player's footfalls are audible across a valley. |
 | `doSizeWaterDisplacement` | `true` | Whether a very large player parts shallow water. Separate because it moves blocks every tick a giant is in the water. |
+| `startingSize` | `normal` | The size a player is the first time they join the world: a fixed size from 0.4x to 2.5x, or `random` for a different one per player in that range. |
 
 ## What ability scaling changes
 
@@ -138,7 +142,11 @@ group, unless something has already hit them.
 
 ## Starting sizes (servers)
 
-`config/shapesnsizes.properties` is written on first run.
+A dedicated server has no world-creation screen, so `server.properties` gets a line of its own,
+written as `starting-size=1` on the first start. Set it to a size, or to `random` for a different
+size per new player between 0.4x and 2.5x.
+
+For sizes per player, `config/shapesnsizes.properties` is written on first run.
 
 ```
 default-scale = 1.0
@@ -146,8 +154,10 @@ player.SomePlayer = 0.5
 player.AnotherPlayer = 3
 ```
 
-These apply on login, and only to a player the server has no size on record for. After that
-everyone keeps whatever size they have, so `/scale` sticks and nobody springs back on reconnect.
+These apply on login, and only to a player the server has no size on record for. A named entry
+beats everything; then `starting-size` in `server.properties`, then `default-scale`, then the
+world's `startingSize` rule, each passing when it says normal. After that everyone keeps whatever
+size they have, so `/scale` sticks and nobody springs back on reconnect.
 Run `/scaling reload` to pick up edits without a restart.
 
 ## Install

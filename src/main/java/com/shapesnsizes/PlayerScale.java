@@ -304,7 +304,7 @@ public final class PlayerScale {
 	public static float fallSeverity(Player player) {
 		float s = get(player);
 		if (s == DEFAULT) return 1.0f;
-		return s > DEFAULT ? 1.0f / s : s * s;
+		return s > DEFAULT ? 1.0f / s : s;
 	}
 
 	public static double relieveDrag(net.minecraft.core.entity.Entity entity, double drag) {
@@ -385,6 +385,16 @@ public final class PlayerScale {
 
 	public static boolean sizeGriefing(World world) {
 		return rule(world, ScalingRules.SIZE_GRIEFING, true);
+	}
+
+	public static boolean tramplePlayers(World world) {
+		return rule(world, ScalingRules.TRAMPLE_PLAYERS, true);
+	}
+
+	public static StartingSize startingSize(World world) {
+		if (world == null) return StartingSize.NORMAL;
+		StartingSize choice = world.getGameRuleValue(ScalingRules.STARTING_SIZE);
+		return choice == null ? StartingSize.NORMAL : choice;
 	}
 
 	public static boolean stompSounds(World world) {

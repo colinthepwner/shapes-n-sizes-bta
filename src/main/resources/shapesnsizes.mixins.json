@@ -55,6 +55,7 @@
     "client.EntityRendererMixin"
   ],
   "server": [
+    "server.MinecraftServerMixin",
     "server.PacketHandlerServerMixin",
     "server.PlayerServerMixin",
     "server.PlayerListMixin",

@@ -279,6 +279,7 @@ public final class Trample {
 		World world = self.world;
 		if (world == null || world.isClientSide || !self.isAlive()) return;
 		if (!PlayerScale.sizeGriefing(world) || self.hasNoPhysics()) return;
+		boolean players = PlayerScale.tramplePlayers(world);
 
 		List<Entity> nearby = world.getEntitiesWithinAABBExcludingEntity(self,
 			MathHelper.aabbGrow(self.bb, 0.2, 0.2, 0.2, new AABBd()));
@@ -293,8 +294,11 @@ public final class Trample {
 			if (mine <= 0.0f || theirs <= 0.0f) continue;
 
 			if (treads(self, victimOrCrusher) && connects(self, victimOrCrusher)) {
+				if (!players && victimOrCrusher instanceof Player) continue;
 				victimOrCrusher.hurt(self, crushDamage(mine / theirs), DamageType.GENERIC);
 			} else if (treads(victimOrCrusher, self) && connects(victimOrCrusher, self)) {
+
+				if (!players) continue;
 				self.hurt(victimOrCrusher, crushDamage(theirs / mine), DamageType.GENERIC);
 			}
 		}

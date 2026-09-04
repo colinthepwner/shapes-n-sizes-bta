@@ -4,6 +4,7 @@ import com.shapesnsizes.PlayerScale;
 import com.shapesnsizes.ScaledPlayer;
 import com.shapesnsizes.ShapesConfig;
 import com.shapesnsizes.ShapesNSizes;
+import com.shapesnsizes.StartingSize;
 import net.minecraft.core.util.helper.DyeColor;
 import net.minecraft.server.entity.player.PlayerServer;
 import net.minecraft.server.net.PlayerList;
@@ -19,10 +20,28 @@ public class PlayerListMixin {
 	private void shapesnsizes$onLogin(PlayerServer player, CallbackInfo ci) {
 
 		if (player instanceof ScaledPlayer && !((ScaledPlayer) player).shapesnsizes$hasSavedScale()) {
-			float starting = ShapesConfig.startingScale(player.username);
+			float starting;
+			String from;
+			Float named = ShapesConfig.namedScale(player.username);
+			if (named != null) {
+				starting = named;
+				from = "the config's entry for them";
+			} else {
+				starting = ShapesConfig.serverStartingScale(player.world.rand);
+				from = ShapesConfig.serverIsRandom() ? "a random draw (server.properties)" : "server.properties";
+				if (starting == PlayerScale.DEFAULT) {
+					starting = ShapesConfig.defaultScale();
+					from = "the config's default";
+				}
+				if (starting == PlayerScale.DEFAULT) {
+					StartingSize choice = PlayerScale.startingSize(player.world);
+					starting = choice.pick(player.world.rand);
+					from = choice == StartingSize.RANDOM ? "a random draw (world rule)" : "the world's starting size";
+				}
+			}
 			if (starting != PlayerScale.DEFAULT) {
 				PlayerScale.set(player, starting);
-				ShapesNSizes.LOGGER.info("{} starts at {}x, from the config.", player.username, PlayerScale.format(starting));
+				ShapesNSizes.LOGGER.info("{} starts at {}x, from {}.", player.username, PlayerScale.format(starting), from);
 			}
 		}
 		PlayerScale.snapEase(player);
