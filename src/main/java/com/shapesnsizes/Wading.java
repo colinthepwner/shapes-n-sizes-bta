@@ -18,6 +18,8 @@ public final class Wading {
 
 	private static final double MOVING = 0.01;
 
+	private static final int STILL_TICKS = 10;
+
 	private static final int MAX_HALF_WIDTH = 6;
 	private static final int MAX_DEPTH_PROBE = 24;
 
@@ -27,6 +29,8 @@ public final class Wading {
 		private final Map<TilePos, Block<?>> held = new HashMap<>();
 		private boolean spent = false;
 		private float spentDepth = Float.MAX_VALUE;
+
+		private int stillTicks = 0;
 	}
 
 	public static void tick(Player player, State state) {
@@ -57,7 +61,8 @@ public final class Wading {
 			return;
 		}
 
-		boolean moving = stepLength(player) > MOVING;
+		state.stillTicks = stepLength(player) > MOVING ? 0 : state.stillTicks + 1;
+		boolean moving = state.stillTicks < STILL_TICKS;
 		if (depth > knee || !moving) {
 
 			releaseAll(world, state);
