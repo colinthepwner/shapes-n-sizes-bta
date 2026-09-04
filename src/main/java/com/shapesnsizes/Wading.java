@@ -33,17 +33,19 @@ public final class Wading {
 		World world = player.world;
 		if (world == null || world.isClientSide) return;
 
-		if (!Behemoth.is(player) || !player.isInWater() || !PlayerScale.waterDisplacement(world)) {
+		float depth = depthAtFeet(world, player);
+		boolean inWater = depth > 0.0f;
+
+		if (!Behemoth.is(player) || !inWater || !PlayerScale.waterDisplacement(world)) {
 			releaseAll(world, state);
 
-			if (!player.isInWater()) {
+			if (!inWater) {
 				state.spent = false;
 				state.spentDepth = Float.MAX_VALUE;
 			}
 			return;
 		}
 
-		float depth = depthAtFeet(world, player);
 		float knee = KNEE * player.bbHeight;
 
 		if (state.spent && depth < state.spentDepth) {
@@ -55,7 +57,7 @@ public final class Wading {
 			return;
 		}
 
-		boolean moving = Math.abs(player.x - player.xo) + Math.abs(player.z - player.zo) > MOVING;
+		boolean moving = stepLength(player) > MOVING;
 		if (depth > knee || !moving) {
 
 			releaseAll(world, state);
@@ -122,6 +124,11 @@ public final class Wading {
 	private static void shapesnsizes$setQuietly(World world, TilePos pos, Block<?> block) {
 		world.setBlockTypeDataRaw(pos, block, 0);
 		world.markBlockNeedsUpdate(pos);
+	}
+
+	private static double stepLength(Player player) {
+		if (player instanceof SizeTicker) return ((SizeTicker) player).shapesnsizes$stepLength();
+		return Math.abs(player.x - player.xo) + Math.abs(player.z - player.zo);
 	}
 
 	private static float depthAtFeet(World world, Player player) {
