@@ -55,6 +55,12 @@ public class ScalingCommand implements CommandManager.CommandRegistry {
 			.executes(this::reset));
 		root.then(reset);
 
+		ArgumentBuilderLiteral<CommandSource> brownies = ArgumentBuilderLiteral.literal("browniereset");
+		brownies.executes(this::clearBonusSelf);
+		brownies.then(ArgumentBuilderRequired.<CommandSource, EntitySelector>argument("players", ArgumentTypeEntity.usernames())
+			.executes(this::clearBonus));
+		root.then(brownies);
+
 		ArgumentBuilderLiteral<CommandSource> setAbility = ArgumentBuilderLiteral.literal("setabilityscaling");
 		setAbility.then(ArgumentBuilderRequired.<CommandSource, Integer>argument("percent", ArgumentTypeInteger.integer(0, 1000))
 			.executes(this::setAbility));
@@ -75,6 +81,51 @@ public class ScalingCommand implements CommandManager.CommandRegistry {
 		alias.redirect(node);
 		alias.executes(this::usage);
 		dispatcher.register(alias);
+
+		ArgumentBuilderLiteral<CommandSource> brownieAlias = ArgumentBuilderLiteral.literal("browniereset");
+		brownieAlias.requires(CommandSource::hasAdmin);
+		brownieAlias.executes(this::clearBonusSelf);
+		brownieAlias.then(ArgumentBuilderRequired.<CommandSource, EntitySelector>argument("players", ArgumentTypeEntity.usernames())
+			.executes(this::clearBonus));
+		dispatcher.register(brownieAlias);
+	}
+
+	private int clearBonusSelf(CommandContext<CommandSource> c) {
+		Player self = c.getSource().getSender();
+		if (self == null) {
+			c.getSource().sendMessage("§cThe console has no brownies to wear off. Name a player.");
+			return 0;
+		}
+		return clearBonusFor(c, java.util.Collections.singletonList(self));
+	}
+
+	private int clearBonus(CommandContext<CommandSource> c) throws CommandSyntaxException {
+		List<Player> players = players(c);
+		if (players.isEmpty()) {
+			c.getSource().sendMessage("§cNo players matched.");
+			return 0;
+		}
+		return clearBonusFor(c, players);
+	}
+
+	private int clearBonusFor(CommandContext<CommandSource> c, List<Player> players) {
+		for (Player p : players) {
+			float eaten = PlayerScale.getBonus(p);
+			PlayerScale.clearBonus(p);
+			if (p != c.getSource().getSender()) {
+				c.getSource().sendMessage(p, "§eWhatever you had eaten has worn off; you are §f"
+					+ PlayerScale.format(PlayerScale.getBase(p)) + "x §eagain.");
+			}
+			if (players.size() == 1) {
+				c.getSource().sendMessage("§aCleared §f" + PlayerScale.format(eaten)
+					+ "x §aof eaten size from §f" + p.getDisplayName() + "§a, leaving §f"
+					+ PlayerScale.format(PlayerScale.getBase(p)) + "x§a.");
+			}
+		}
+		if (players.size() > 1) {
+			c.getSource().sendMessage("§aCleared eaten size from §f" + players.size() + " players§a.");
+		}
+		return 1;
 	}
 
 	private int reload(CommandContext<CommandSource> c) {

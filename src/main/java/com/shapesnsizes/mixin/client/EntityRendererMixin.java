@@ -6,12 +6,25 @@ import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
+import net.minecraft.client.render.tessellator.TessellatorGeneral;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 @Mixin(value = EntityRenderer.class, remap = false)
 public class EntityRendererMixin {
 
 	private static final float GAP = 0.8f;
+
+	@ModifyConstant(method = "renderLivingLabel", constant = {
+		@Constant(floatValue = 0.026666667f),
+		@Constant(floatValue = -0.026666667f)
+	})
+	private float shapesnsizes$labelTextSize(float vanilla, TessellatorGeneral t, Entity entity,
+			CharSequence text, double x, double y, double z, int maxDistance, boolean depthTest) {
+		if (!(entity instanceof Player)) return vanilla;
+		return vanilla * PlayerScale.labelScale((Player) entity);
+	}
 
 	@Redirect(
 		method = "renderFire",

@@ -42,6 +42,7 @@
     "client.PlayerLocalInvoker",
     "client.WorldRendererMixin",
     "client.MobRendererBipedMixin",
+    "client.MobRendererLimbMixin",
     "client.MobRendererPlayerMixin",
     "client.ItemModelMixin",
     "client.ItemRendererMixin",

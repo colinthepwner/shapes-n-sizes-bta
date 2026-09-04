@@ -19,6 +19,8 @@ import org.lwjgl.opengl.GL41;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -47,6 +49,25 @@ public class MobRendererPlayerMixin {
 			GLRenderer.modelM4f().translate(0.0f, -12.0f, 0.0f);
 		}
 	}
+
+	@ModifyConstant(method = "renderSpecials", constant = @Constant(floatValue = 2.3f))
+	private float shapesnsizes$crouchedLabelHeight(float vanilla, TessellatorGeneral t, Player entity, double x, double y, double z) {
+		float scale = PlayerScale.get(entity);
+		if (scale == PlayerScale.DEFAULT) return vanilla;
+		return entity.bbHeight + LABEL_GAP * scale;
+	}
+
+	@ModifyConstant(method = "renderSpecials", constant = {
+		@Constant(floatValue = 0.026666671f),
+		@Constant(floatValue = -0.026666671f)
+	})
+	private float shapesnsizes$crouchedLabelTextSize(float vanilla, TessellatorGeneral t, Player entity,
+			double x, double y, double z) {
+		return vanilla * PlayerScale.labelScale(entity);
+	}
+
+	@Unique
+	private static final float LABEL_GAP = 0.8f;
 
 	@Unique
 	private static final float CRAWL_TIP = (float) (Math.PI / 2.0);

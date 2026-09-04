@@ -90,33 +90,20 @@ public abstract class MobMixin {
 	private void shapesnsizes$gaitInBodyLengths(float moveStrafing, float moveForward, CallbackInfo ci) {
 		Mob self = (Mob) (Object) this;
 		if (!(self instanceof Player)) return;
-		Player player = (Player) self;
-		float scale = PlayerScale.get(player);
-		if (scale == PlayerScale.DEFAULT) {
-			this.shapesnsizes$cadence = self.walkAnimSpeed;
-			return;
-		}
+		float scale = PlayerScale.get((Player) self);
+		if (scale == PlayerScale.DEFAULT) return;
 
 		double dx = self.x - self.xo;
 		double dz = self.z - self.zo;
 		float raw = (float) Math.sqrt(dx * dx + dz * dz) * 4.0f;
-
-		float pace = Math.max(0.05f, PlayerScale.speedFactor(player));
-		float amplitudeTarget = Math.min(raw / pace, 1.0f);
-
-		float cadenceTarget = Math.min(raw / scale, 1.0f);
 		float vanillaTarget = Math.min(raw, 1.0f);
+		float wantedTarget = Math.min(raw / scale, 1.0f);
 
 		float previous = self.walkAnimSpeedO;
 		float vanillaSpeed = previous + (vanillaTarget - previous) * 0.4f;
-		float cadenceSpeed = this.shapesnsizes$cadence + (cadenceTarget - this.shapesnsizes$cadence) * 0.4f;
-		float amplitudeSpeed = previous + (amplitudeTarget - previous) * 0.4f;
+		float wantedSpeed = previous + (wantedTarget - previous) * 0.4f;
 
-		self.walkAnimPos += cadenceSpeed - vanillaSpeed;
-		self.walkAnimSpeed = amplitudeSpeed;
-		this.shapesnsizes$cadence = cadenceSpeed;
+		self.walkAnimPos += wantedSpeed - vanillaSpeed;
+		self.walkAnimSpeed = wantedSpeed;
 	}
-
-	@Unique
-	private float shapesnsizes$cadence = 0.0f;
 }

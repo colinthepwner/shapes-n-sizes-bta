@@ -341,6 +341,16 @@ public final class PlayerScale {
 
 	private static final double PRESENCE_CEILING = 3.0;
 
+	public static float labelScale(Player player) {
+		float scale = player == null ? DEFAULT : get(player);
+		if (scale == DEFAULT) return 1.0f;
+		return MathHelper.clamp((float) Math.pow(scale, LABEL_EXPONENT), LABEL_MIN, LABEL_MAX);
+	}
+
+	private static final double LABEL_EXPONENT = 0.4;
+	private static final float LABEL_MIN = 0.6f;
+	private static final float LABEL_MAX = 2.5f;
+
 	public static float nearPlane(Player player) {
 		float scale = player == null ? DEFAULT : get(player);
 		return Math.max(MIN_NEAR_PLANE, VANILLA_NEAR_PLANE * Math.min(1.0f, scale));
