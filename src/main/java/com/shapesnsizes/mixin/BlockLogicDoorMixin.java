@@ -55,7 +55,7 @@ public abstract class BlockLogicDoorMixin {
 		boolean open = BlockLogicDoor.isOpen(data);
 		int facing = placementFacing(data);
 
-		boolean alongX = facing == 0 || facing == 2;
+		boolean alongX = facing == 1 || facing == 3;
 		TilePos beside = new TilePos();
 		TilePos above = new TilePos();
 

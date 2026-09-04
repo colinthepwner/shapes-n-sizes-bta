@@ -159,7 +159,7 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 		int facing = placementFacing(data);
 		boolean open = isOpenFor(data ^ MASK_OPENED);
 
-		boolean alongX = facing == 0 || facing == 2;
+		boolean alongX = facing == 1 || facing == 3;
 		for (int step = -1; step <= 1; step += 2) {
 			TilePos beside = new TilePos(
 				tilePos.x() + (alongX ? step : 0), tilePos.y(), tilePos.z() + (alongX ? 0 : step));
