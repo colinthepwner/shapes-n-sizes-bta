@@ -6,6 +6,7 @@ import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicLayerSnow;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.Entity;
+import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.world.World;
 import net.minecraft.core.world.pos.TilePosc;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,6 +22,8 @@ public abstract class BlockLogicLayerSnowMixin extends BlockLogic {
 	@Override
 	public void onEntityCollision(World world, TilePosc tilePos, Entity entity) {
 		super.onEntityCollision(world, tilePos, entity);
+
+		if (entity instanceof Player && PlayerScale.isSnowWalker((Player) entity)) return;
 		double drag = PlayerScale.thickenDrag(entity, BASE_DRAG);
 		if (drag == 1.0) return;
 		entity.xd *= drag;

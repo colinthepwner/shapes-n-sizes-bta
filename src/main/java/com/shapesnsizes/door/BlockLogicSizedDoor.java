@@ -130,7 +130,7 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 		int data = world.getBlockData(tilePos);
 		int toggled = data ^ MASK_OPENED;
 		this.setDataOnAll(world, tilePos, toggled);
-		this.swingPartner(world, tilePos, data);
+		this.matchPartner(world, tilePos);
 		if (!this.isSupported(world, tilePos, data)) {
 			this.dropWithCause(world, EnumDropCause.WORLD, tilePos, toggled, null, null);
 			this.removeWhole(world, tilePos);
@@ -154,10 +154,11 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 
 	private static final double PITCH_CURVE = 0.2;
 
-	private void swingPartner(World world, TilePosc tilePos, int data) {
+	private void matchPartner(World world, TilePosc tilePos) {
 
+		int data = world.getBlockData(tilePos);
 		int facing = placementFacing(data);
-		boolean open = isOpenFor(data ^ MASK_OPENED);
+		boolean open = isOpenFor(data);
 
 		boolean alongX = facing == 1 || facing == 3;
 		for (int step = -1; step <= 1; step += 2) {
@@ -199,15 +200,19 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 			return;
 		}
 		boolean isOpen = (data & MASK_OPENED) != 0;
-		if (isOpen == isPowered) return;
-		TilePos[] all = this.segments(tilePos);
-		for (TilePos pos : all) {
-			if (world.getBlockLogic(pos, BlockLogicSizedDoor.class) != null) {
-				world.setBlockDataNotify(pos, data ^ MASK_OPENED);
+
+		if (isOpen != isPowered) {
+			TilePos[] all = this.segments(tilePos);
+			for (TilePos pos : all) {
+				if (world.getBlockLogic(pos, BlockLogicSizedDoor.class) != null) {
+					world.setBlockDataNotify(pos, data ^ MASK_OPENED);
+				}
 			}
+			world.markBlocksDirty(tilePos, all[this.height - 1]);
+			this.playDoorSound(world, tilePos, (data & MASK_OPENED) == 0);
 		}
-		world.markBlocksDirty(tilePos, all[this.height - 1]);
-		this.playDoorSound(world, tilePos, (data & MASK_OPENED) == 0);
+
+		this.matchPartner(world, tilePos);
 	}
 
 	@Override

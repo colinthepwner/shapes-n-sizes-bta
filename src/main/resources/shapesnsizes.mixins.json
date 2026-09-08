@@ -25,6 +25,7 @@
     "WorldTargetingMixin",
     "WorldFixtureCollisionMixin",
     "BlockLogicDoorMixin",
+    "BlockLogicBedMixin",
     "BlockLogicMagmaMixin",
     "BlockLogicBrimthawMixin",
     "BlockLogicBoulderMagmaticMixin",
@@ -52,7 +53,8 @@
     "client.HudComponentHealthBarMixin",
     "client.HudComponentOxygenBarMixin",
     "client.EntityRendererDispatcherMixin",
-    "client.EntityRendererMixin"
+    "client.EntityRendererMixin",
+    "client.PacketHandlerClientMixin"
   ],
   "server": [
     "server.MinecraftServerMixin",

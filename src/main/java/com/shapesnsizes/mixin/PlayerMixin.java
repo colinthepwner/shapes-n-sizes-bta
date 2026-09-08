@@ -29,6 +29,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Constant;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -83,6 +85,13 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 	@Override
 	public void shapesnsizes$setEasedScale(float scale) {
 		this.shapesnsizes$eased = scale;
+	}
+
+	@Shadow protected abstract boolean wantSneak();
+
+	@Override
+	public boolean shapesnsizes$wantsSneak() {
+		return this.wantSneak();
 	}
 
 	@Unique
@@ -213,6 +222,7 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 		shapesnsizes$fluidDrag(self);
 		shapesnsizes$glide(self);
 		shapesnsizes$walkOnWater(self);
+		shapesnsizes$walkOnSnow(self);
 		shapesnsizes$checkRider(self);
 		shapesnsizes$checkVehicleHolds(self);
 
@@ -425,6 +435,23 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 		this.fallDistance = 0.0f;
 	}
 
+	@Unique
+	private void shapesnsizes$walkOnSnow(Player self) {
+		if (!PlayerScale.isSnowWalker(self)) return;
+		if (this.hasNoPhysics() || this.vehicle != null || this.isMultiplayerEntity) return;
+		if (this.isInWater() || this.isInLava()) return;
+		TilePos snow = PlayerScale.snowUnderfoot(self);
+		if (snow == null) return;
+		double surface = PlayerScale.snowSurface(self, snow);
+
+		if (this.y >= surface) return;
+		this.y = surface;
+		this.setBounds();
+		if (this.yd < 0.0) this.yd = 0.0;
+		this.onGround = true;
+		this.fallDistance = 0.0f;
+	}
+
 	@Inject(method = "jump", at = @At("TAIL"))
 	private void shapesnsizes$scaleJump(CallbackInfo ci) {
 		Player self = (Player) (Object) this;
@@ -506,6 +533,50 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 
 		float severity = PlayerScale.fallSeverity(self);
 		return severity == 1.0f ? distance : distance * severity;
+	}
+
+	@Inject(method = "isInWall", at = @At("RETURN"), cancellable = true)
+	private void shapesnsizes$suffocateInsideTheBody(CallbackInfoReturnable<Boolean> cir) {
+		if (!cir.getReturnValueZ()) return;
+		Player self = (Player) (Object) this;
+		if (!PlayerScale.isScaled(self) || this.world == null) return;
+		if (!this.shapesnsizes$headSliceInWall(self)) cir.setReturnValue(false);
+	}
+
+	@Unique
+	private boolean shapesnsizes$headSliceInWall(Player self) {
+		double inset = Math.min(0.15, this.bbWidth * 0.2);
+		double lift = Math.min(0.05, this.bbHeight * 0.1);
+
+		double head = this.y + this.getHeadHeight();
+		double floorY = this.bb.minY + lift;
+		double ceilY = Math.max(floorY, this.bb.maxY - lift);
+		double lowY = Math.min(Math.max(head - lift, floorY), ceilY);
+		double highY = Math.min(Math.max(head + lift, floorY), ceilY);
+
+		int x0 = MathHelper.floor(this.bb.minX + inset);
+		int x1 = MathHelper.floor(this.bb.maxX - inset);
+		int z0 = MathHelper.floor(this.bb.minZ + inset);
+		int z1 = MathHelper.floor(this.bb.maxZ - inset);
+		int y0 = MathHelper.floor(lowY);
+		int y1 = MathHelper.floor(highY);
+
+		TilePos probe = new TilePos(0, 0, 0);
+		for (int x = x0; x <= x1; x++) {
+			for (int y = y0; y <= y1; y++) {
+				for (int z = z0; z <= z1; z++) {
+					probe.set(x, y, z);
+					if (this.world.shouldBlockSuffocateEntities(probe, Player.class)) return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	@ModifyConstant(method = "sleepInBedAt", constant = @Constant(doubleValue = 3.0))
+	private double shapesnsizes$sleepWithinReach(double blocks) {
+		float f = PlayerScale.abilityFactor((Player) (Object) this);
+		return f <= 1.0f ? blocks : blocks * f;
 	}
 
 	@Inject(method = "setPlayerSleeping", at = @At("TAIL"))

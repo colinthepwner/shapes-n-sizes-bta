@@ -31,4 +31,27 @@ public class EntityMixin {
 		float scale = PlayerScale.get((Player) self);
 		return scale == PlayerScale.DEFAULT ? perBlock : perBlock / scale;
 	}
+
+	@Redirect(
+		method = "move",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/Entity;isSneaking()Z", ordinal = 0)
+	)
+	private boolean shapesnsizes$edgeGuardWantsCrouch(Entity self) {
+		return self instanceof Player ? PlayerScale.sneakingOnPurpose((Player) self) : self.isSneaking();
+	}
+
+	@Redirect(
+		method = "move",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/Entity;isSneaking()Z", ordinal = 2)
+	)
+	private boolean shapesnsizes$stepDownWantsCrouch(Entity self) {
+		return self instanceof Player ? PlayerScale.sneakingOnPurpose((Player) self) : self.isSneaking();
+	}
+
+	@ModifyConstant(method = "move", constant = @Constant(doubleValue = -1.0))
+	private double shapesnsizes$edgeGuardReach(double drop) {
+		Entity self = (Entity) (Object) this;
+		if (!(self instanceof Player)) return drop;
+		return -PlayerScale.edgeGuardDrop((Player) self);
+	}
 }

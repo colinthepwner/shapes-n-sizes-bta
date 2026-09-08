@@ -44,6 +44,7 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
   are drawn.
 - Tall grass and snow layers slow you down. Roses draw blood at a third size. Rain is deep enough
   to drown in, unless you are wearing a helmet or standing under something.
+- Leather boots keep you on top of snow layers instead of sinking into them, from half size.
 - Pressure plates stop noticing you: stone plates at three quarters size, every plate at half.
 
 ## Either way
@@ -123,6 +124,7 @@ world settings screen when a world is created.
 | `sizeTramplePlayers` | `true` | Whether a big enough body can tread on a small enough player. Mobs underfoot are covered by `doSizeGriefing`. |
 | `doSizeStompSounds` | `false` | Whether a very large player's footfalls are audible across a valley. |
 | `doSizeWaterDisplacement` | `true` | Whether a very large player parts shallow water. Separate because it moves blocks every tick a giant is in the water. |
+| `doSizeDrag` | `true` | Whether terrain is harder going at some sizes: undergrowth and snow for a small player, leaf canopy for a big one. |
 | `startingSize` | `normal` | The size a player is the first time they join the world: a fixed size from 0.4x to 2.5x, or `random` for a different one per player in that range. |
 
 ## What ability scaling changes
@@ -145,6 +147,9 @@ group, unless something has already hit them.
 A dedicated server has no world-creation screen, so `server.properties` gets a line of its own,
 written as `starting-size=1` on the first start. Set it to a size, or to `random` for a different
 size per new player between 0.4x and 2.5x.
+
+`server.properties` also gets `require-shapes-n-sizes=true`, which disconnects a client whose
+copy of the mod does not match the server's. Set it to `false` to let anyone in.
 
 For sizes per player, `config/shapesnsizes.properties` is written on first run.
 

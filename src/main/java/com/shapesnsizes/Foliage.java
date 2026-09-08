@@ -37,6 +37,8 @@ public final class Foliage {
 	public static double leafDrag(Player player) {
 		float scale = PlayerScale.get(player);
 		if (scale < WADE) return 1.0;
+
+		if (!PlayerScale.sizeDrag(player.world)) return 1.0;
 		return 1.0 - (1.0 - BASE_KEEP) / (scale / WADE);
 	}
 

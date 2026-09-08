@@ -31,6 +31,9 @@ public final class ShapesConfig {
 	private static float serverFixed = PlayerScale.DEFAULT;
 	private static boolean serverRandom = false;
 
+	public static final String REQUIRE_PROPERTY = "require-shapes-n-sizes";
+	private static boolean requireClient = true;
+
 	private ShapesConfig() {}
 
 	public static float startingScale(String username) {
@@ -46,6 +49,12 @@ public final class ShapesConfig {
 	public static void loadServerProperty(PropertyManager properties) {
 		serverFixed = PlayerScale.DEFAULT;
 		serverRandom = false;
+
+		requireClient = properties.getBooleanProperty(REQUIRE_PROPERTY, true);
+		if (!requireClient) {
+			ShapesNSizes.LOGGER.info("server.properties: {}=false, so clients are not checked for a matching mod version.",
+				REQUIRE_PROPERTY);
+		}
 		String raw = properties.getStringProperty(SERVER_PROPERTY, SERVER_PROPERTY_DEFAULT).trim();
 		if (raw.equalsIgnoreCase(SERVER_PROPERTY_RANDOM)) {
 			serverRandom = true;
@@ -67,6 +76,10 @@ public final class ShapesConfig {
 
 	public static boolean serverIsRandom() {
 		return serverRandom;
+	}
+
+	public static boolean requiresClientMod() {
+		return requireClient;
 	}
 
 	public static float serverStartingScale(Random random) {

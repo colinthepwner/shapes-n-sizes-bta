@@ -7,4 +7,6 @@ public interface ScaledPlayer {
 	float shapesnsizes$easedScale();
 
 	void shapesnsizes$setEasedScale(float scale);
+
+	boolean shapesnsizes$wantsSneak();
 }

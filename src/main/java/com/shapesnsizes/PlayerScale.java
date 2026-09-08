@@ -441,10 +441,16 @@ public final class PlayerScale {
 	public static double thickenDrag(net.minecraft.core.entity.Entity entity, double drag) {
 		if (!(entity instanceof Player)) return 1.0;
 		Player player = (Player) entity;
-		if (!isSmall(player)) return 1.0;
+		if (!isSmall(player) || !sizeDrag(player.world)) return 1.0;
 		float f = abilityFactor(player);
 		if (f >= 1.0f) return drag;
 		return Math.max(0.25, 1.0 - (1.0 - drag) / f);
+	}
+
+	public static boolean sizeDrag(World world) {
+		if (world == null) return true;
+		Boolean on = world.getGameRuleValue(ScalingRules.SIZE_DRAG);
+		return on == null || on;
 	}
 
 	private static boolean smallAndHolding(Player player, int itemID) {
@@ -522,6 +528,36 @@ public final class PlayerScale {
 		Block<?> above = player.world.getBlockType(new TilePos(bx, by + 1, bz));
 		if (above != null && above.hasTag(BlockTags.IS_WATER)) return null;
 		return probe;
+	}
+
+	public static boolean isSnowWalker(Player player) {
+		if (player == null || !isSmall(player)) return false;
+		ItemStack boots = player.getItemInArmorSlot(HumanArmorShape.BOOTS);
+		return boots != null && boots.itemID == Items.ARMOR_BOOTS_LEATHER.id;
+	}
+
+	public static TilePos snowUnderfoot(Player player) {
+		if (player == null || player.world == null) return null;
+		int bx = MathHelper.floor(player.x);
+		int by = MathHelper.floor(player.y + 0.05);
+		int bz = MathHelper.floor(player.z);
+		TilePos probe = new TilePos(bx, by, bz);
+		if (player.world.getBlockType(probe) != Blocks.LAYER_SNOW) return null;
+		if (player.world.getBlockType(new TilePos(bx, by + 1, bz)) == Blocks.LAYER_SNOW) return null;
+		return probe;
+	}
+
+	public static double snowSurface(Player player, TilePos snow) {
+		int layers = (player.world.getBlockData(snow) & 7) + 1;
+		return snow.y + layers * 0.125;
+	}
+
+	public static boolean sneakingOnPurpose(Player player) {
+		return player != null && player.isSneaking() && ((ScaledPlayer) player).shapesnsizes$wantsSneak();
+	}
+
+	public static double edgeGuardDrop(Player player) {
+		return Math.min(1.0, get(player));
 	}
 
 	public static String format(float scale) {
