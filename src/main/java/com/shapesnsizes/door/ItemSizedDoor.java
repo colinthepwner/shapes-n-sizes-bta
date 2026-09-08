@@ -46,7 +46,7 @@ public class ItemSizedDoor extends Item implements IPlaceable {
 		if (selfStack.stackSize <= 0) return false;
 		if (!this.canPlaceDirectlyAtPosition(selfStack, world, player, blockPos, side, xHit, yHit)) return false;
 
-		int meta = this.placementData(world, player, blockPos, side);
+		int meta = this.placementData(world, player, blockPos, side) | this.extraData(selfStack);
 		BlockLogicSizedDoor bottom = (BlockLogicSizedDoor) this.segments[0].getLogic();
 		if (!bottom.canPlaceAt(world, blockPos, meta)) return false;
 
@@ -80,7 +80,11 @@ public class ItemSizedDoor extends Item implements IPlaceable {
 		return true;
 	}
 
-	private int placementData(World world, @Nullable Player player, TilePosc blockPos, Side side) {
+	protected int extraData(@NotNull ItemStack selfStack) {
+		return 0;
+	}
+
+	protected int placementData(World world, @Nullable Player player, TilePosc blockPos, Side side) {
 		Direction leftDir;
 		if (player != null) {
 			leftDir = player.getHorizontalPlacementDirection(side).rotateY(1);

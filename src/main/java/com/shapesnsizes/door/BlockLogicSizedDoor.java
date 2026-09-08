@@ -30,12 +30,15 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 	public final int height;
 	public final int index;
 
+	public final Object family;
+
 	public BlockLogicSizedDoor(@NotNull Block<?> block, @NotNull Material material, int height, int index,
-							   @Nullable Supplier<@NotNull Item> droppedItem) {
+							   @NotNull Object family, @Nullable Supplier<@NotNull Item> droppedItem) {
 
 		super(block, material, index > 0, false, droppedItem);
 		this.height = height;
 		this.index = index;
+		this.family = family;
 
 		this.setBlockBounds(0.0, -index, 0.0, 1.0, height - index, 1.0);
 	}
@@ -58,8 +61,14 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 	}
 
 	private boolean isSegment(World world, TilePosc pos, int expectedIndex) {
+		BlockLogicSizedDoor logic = this.sibling(world, pos);
+		return logic != null && logic.index == expectedIndex;
+	}
+
+	@Nullable
+	protected BlockLogicSizedDoor sibling(World world, TilePosc pos) {
 		BlockLogicSizedDoor logic = world.getBlockLogic(pos, BlockLogicSizedDoor.class);
-		return logic != null && logic.height == this.height && logic.index == expectedIndex;
+		return logic != null && logic.family == this.family && logic.height == this.height ? logic : null;
 	}
 
 	private boolean isWhole(World world, TilePosc anyPos) {
@@ -70,9 +79,9 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 		return true;
 	}
 
-	private void setDataOnAll(World world, TilePosc anyPos, int data) {
+	protected void setDataOnAll(World world, TilePosc anyPos, int data) {
 		for (TilePos pos : this.segments(anyPos)) {
-			if (world.getBlockLogic(pos, BlockLogicSizedDoor.class) != null) {
+			if (this.sibling(world, pos) != null) {
 				world.setBlockData(pos, data);
 				world.markBlockNeedsUpdate(pos);
 			}
@@ -81,7 +90,7 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 
 	private void removeWhole(World world, TilePosc anyPos) {
 		for (TilePos pos : this.segments(anyPos)) {
-			if (world.getBlockLogic(pos, BlockLogicSizedDoor.class) != null) {
+			if (this.sibling(world, pos) != null) {
 				world.setBlockTypeNotify(pos, Blocks.AIR);
 			}
 		}
@@ -124,7 +133,7 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 		}
 		if (!this.isBottom()) {
 			TilePos bottom = this.bottomOf(tilePos);
-			BlockLogicSizedDoor logic = world.getBlockLogic(bottom, BlockLogicSizedDoor.class);
+			BlockLogicSizedDoor logic = this.sibling(world, bottom);
 			return logic != null && logic.onInteracted(world, bottom, player, side, xHit, yHit);
 		}
 		int data = world.getBlockData(tilePos);
@@ -195,7 +204,7 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 		}
 		if (!this.isBottom()) {
 			TilePos bottom = this.bottomOf(tilePos);
-			BlockLogicSizedDoor logic = world.getBlockLogic(bottom, BlockLogicSizedDoor.class);
+			BlockLogicSizedDoor logic = this.sibling(world, bottom);
 			if (logic != null) logic.onPoweredBlockChange(world, bottom, isPowered);
 			return;
 		}
@@ -204,7 +213,7 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 		if (isOpen != isPowered) {
 			TilePos[] all = this.segments(tilePos);
 			for (TilePos pos : all) {
-				if (world.getBlockLogic(pos, BlockLogicSizedDoor.class) != null) {
+				if (this.sibling(world, pos) != null) {
 					world.setBlockDataNotify(pos, data ^ MASK_OPENED);
 				}
 			}
@@ -221,8 +230,8 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 		if (!this.isBottom()) {
 
 			TilePos bottom = this.bottomOf(tilePos);
-			BlockLogicSizedDoor logic = world.getBlockLogic(bottom, BlockLogicSizedDoor.class);
-			if (logic == null || logic.height != this.height) {
+			BlockLogicSizedDoor logic = this.sibling(world, bottom);
+			if (logic == null) {
 				world.setBlockTypeNotify(tilePos, Blocks.AIR);
 				return;
 			}
@@ -256,7 +265,7 @@ public class BlockLogicSizedDoor extends BlockLogicDoor {
 
 		for (TilePos pos : this.segments(tilePos)) {
 			if (pos.x == tilePos.x() && pos.y == tilePos.y() && pos.z == tilePos.z()) continue;
-			if (world.getBlockLogic(pos, BlockLogicSizedDoor.class) != null) {
+			if (this.sibling(world, pos) != null) {
 				world.setBlockTypeNotify(pos, Blocks.AIR);
 			}
 		}
