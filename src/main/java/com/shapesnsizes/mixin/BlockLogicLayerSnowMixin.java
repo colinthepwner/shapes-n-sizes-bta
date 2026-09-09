@@ -1,13 +1,16 @@
 package com.shapesnsizes.mixin;
 
+import com.shapesnsizes.Foliage;
 import com.shapesnsizes.PlayerScale;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.BlockLogic;
 import net.minecraft.core.block.BlockLogicLayerSnow;
+import net.minecraft.core.block.BlockLogicLeavesBase;
 import net.minecraft.core.block.material.Material;
 import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.world.World;
+import net.minecraft.core.world.pos.TilePos;
 import net.minecraft.core.world.pos.TilePosc;
 import org.spongepowered.asm.mixin.Mixin;
 
@@ -28,5 +31,15 @@ public abstract class BlockLogicLayerSnowMixin extends BlockLogic {
 		if (drag == 1.0) return;
 		entity.xd *= drag;
 		entity.zd *= drag;
+	}
+
+	@Override
+	public boolean collidesWithEntity(Entity entity, World world, TilePosc tilePos) {
+		if (entity instanceof Player && Foliage.wadesThroughLeaves((Player) entity)) {
+			Block<?> under = world.getBlockType(
+				new TilePos(tilePos.x(), tilePos.y() - 1, tilePos.z()));
+			if (under != null && under.getLogic() instanceof BlockLogicLeavesBase) return false;
+		}
+		return super.collidesWithEntity(entity, world, tilePos);
 	}
 }
