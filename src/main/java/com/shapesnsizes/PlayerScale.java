@@ -297,6 +297,12 @@ public final class PlayerScale {
 		return (float) Math.sqrt(ability);
 	}
 
+	private static final double VANILLA_FLUID_EXIT = 0.3;
+
+	public static double fluidExitHop(Player player) {
+		return VANILLA_FLUID_EXIT * jumpVelocityFactor(player);
+	}
+
 	private static final float VANILLA_JUMP_BLOCKS = 1.1025f;
 
 	private static final float MIN_JUMP_BLOCKS = 1.05f;
@@ -447,6 +453,20 @@ public final class PlayerScale {
 		return Math.max(0.25, 1.0 - (1.0 - drag) / f);
 	}
 
+	public static final float THICKET = 0.4f;
+
+	private static final double THICKET_KEEP = 0.6;
+
+	public static double undergrowthDrag(net.minecraft.core.entity.Entity entity) {
+		if (!(entity instanceof Player)) return 1.0;
+		Player player = (Player) entity;
+		float scale = get(player);
+		if (scale >= THICKET || !sizeDrag(player.world)) return 1.0;
+		double times = THICKET / Math.max(scale, MIN);
+		double loss = (1.0 - THICKET_KEEP) * (times - 1.0) / (THICKET / MIN - 1.0);
+		return Math.max(THICKET_KEEP, 1.0 - loss);
+	}
+
 	public static boolean sizeDrag(World world) {
 		if (world == null) return true;
 		Boolean on = world.getGameRuleValue(ScalingRules.SIZE_DRAG);
@@ -460,7 +480,7 @@ public final class PlayerScale {
 	}
 
 	public static boolean isWaterWalker(Player player) {
-		return smallAndHolding(player, Blocks.ALGAE.id());
+		return player != null && isSmall(player);
 	}
 
 	public static boolean canClimbWalls(Player player) {
@@ -515,6 +535,10 @@ public final class PlayerScale {
 
 	public static boolean canWaterWalk(Player player) {
 		return isWaterWalker(player) && !player.isSneaking() && !isSurfaceBroken(player);
+	}
+
+	public static boolean showsAlgaeRaft(Player player) {
+		return canWaterWalk(player) && smallAndHolding(player, Blocks.ALGAE.id());
 	}
 
 	public static TilePos waterUnderfoot(Player player) {

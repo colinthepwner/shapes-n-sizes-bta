@@ -3,7 +3,11 @@ package com.shapesnsizes.client;
 import com.shapesnsizes.ShapesNSizes;
 import com.shapesnsizes.door.BlockLogicSizedDoor;
 import com.shapesnsizes.door.ShapesDoors;
+import com.shapesnsizes.item.ProjectileCharredBrownie;
 import com.shapesnsizes.item.ShapesItems;
+import net.minecraft.client.render.EntityRendererDispatcher;
+import net.minecraft.client.render.entity.EntityRendererSprite;
+import net.minecraft.client.render.texture.stitcher.TextureRegistry;
 import net.minecraft.client.render.block.model.BlockModelDispatcher;
 import net.minecraft.core.block.Block;
 import net.minecraft.client.render.item.model.ItemModelDispatcher;
@@ -35,6 +39,7 @@ public class ShapesNSizesClient implements ClientModInitializer {
 		CommonEvents.AFTER_GAME_START.listen(key, ShapesNSizesClient::addOptions);
 		ClientEvents.ITEM_MODEL_RELOAD.listen(key, ShapesNSizesClient::bindItemModels);
 		ClientEvents.BLOCK_MODEL_RELOAD.listen(key, ShapesNSizesClient::bindBlockModels);
+		ClientEvents.ENTITY_RENDERER_RELOAD.listen(key, ShapesNSizesClient::bindEntityRenderers);
 	}
 
 	private static void bindItemModels(ItemModelDispatcher dispatcher) {
@@ -51,10 +56,27 @@ public class ShapesNSizesClient implements ClientModInitializer {
 			}
 		}
 
+		bound += bindEmbers(dispatcher, ShapesItems.BROWNIE_BIG_CHARRED, "shapesnsizes:item/browniebigcharredglow");
+		bound += bindEmbers(dispatcher, ShapesItems.BROWNIE_SMALL_CHARRED, "shapesnsizes:item/browniesmallcharredglow");
 		bound += bindPainted(dispatcher, ShapesDoors.DOOR_SHORT_PAINTED, "shapesnsizes:item/door_short");
 		bound += bindPainted(dispatcher, ShapesDoors.DOOR_TALL_PAINTED, "shapesnsizes:item/door_tall");
 		bound += bindPainted(dispatcher, ShapesDoors.DOOR_VERY_TALL_PAINTED, "shapesnsizes:item/door_verytall");
-		ShapesNSizes.LOGGER.info("Bound {} of 8 item models (brownies and doors).", bound);
+		ShapesNSizes.LOGGER.info("Bound {} of 10 item models (brownies and doors).", bound);
+	}
+
+	private static int bindEmbers(ItemModelDispatcher dispatcher, Item item, String overlayTexture) {
+		if (item == null) return 0;
+		dispatcher.addDispatch(new ItemModelEmberOverlay(item, overlayTexture));
+		if (dispatcher.hasDispatch(item)) return 1;
+		ShapesNSizes.LOGGER.warn("No item model bound for {}; it will be invisible.", item.getKey());
+		return 0;
+	}
+
+	private static void bindEntityRenderers(EntityRendererDispatcher dispatcher) {
+		dispatcher.assignRenderer(ProjectileCharredBrownie.Growing.class,
+			new EntityRendererSprite<>(TextureRegistry.getTexture("shapesnsizes:item/browniebigcharred")));
+		dispatcher.assignRenderer(ProjectileCharredBrownie.Shrinking.class,
+			new EntityRendererSprite<>(TextureRegistry.getTexture("shapesnsizes:item/browniesmallcharred")));
 	}
 
 	private static int bindPainted(ItemModelDispatcher dispatcher, Item item, String texturePrefix) {

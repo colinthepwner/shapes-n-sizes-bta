@@ -18,9 +18,11 @@ public final class Foliage {
 
 	public static final float BREAK_LEAVES = 5.0f;
 
+	public static final float FREE = 6.0f;
+
 	public static final float BREAK_LOGS = 9.0f;
 
-	private static final double BASE_KEEP = 0.35;
+	private static final double BASE_KEEP = 0.55;
 
 	private static final int MAX_HALF_WIDTH = 8;
 
@@ -36,10 +38,12 @@ public final class Foliage {
 
 	public static double leafDrag(Player player) {
 		float scale = PlayerScale.get(player);
-		if (scale < WADE) return 1.0;
+		if (scale < WADE || scale >= FREE) return 1.0;
 
 		if (!PlayerScale.sizeDrag(player.world)) return 1.0;
-		return 1.0 - (1.0 - BASE_KEEP) / (scale / WADE);
+
+		double fade = (FREE - scale) / (FREE - WADE);
+		return 1.0 - (1.0 - BASE_KEEP) * fade * fade;
 	}
 
 	public static void tick(Player player) {
@@ -56,25 +60,33 @@ public final class Foliage {
 			&& !Trample.treadsCarefully(player)
 			&& !Behemoth.wearingSoftBoots(player);
 
-		State state = player instanceof Walker ? ((Walker) player).shapesnsizes$foliageState() : null;
-		if (state != null && --state.countdown > 0) return;
-		if (state != null) state.countdown = SWEEP_INTERVAL;
-
-		double backX = 0.0;
-		double backZ = 0.0;
-		if (state != null && state.swept) {
-			backX = player.x - state.sweptX;
-			backZ = player.z - state.sweptZ;
-		}
-		if (state != null) {
-			state.sweptX = player.x;
-			state.sweptZ = player.z;
-			state.swept = true;
-		}
-
-		if (!sweep(player, world, scale, destroy, backX, backZ)) return;
-
 		double keep = leafDrag(player);
+		if (!destroy && keep == 1.0) return;
+
+		State state = player instanceof Walker ? ((Walker) player).shapesnsizes$foliageState() : null;
+		if (state == null || --state.countdown <= 0) {
+			if (state != null) state.countdown = SWEEP_INTERVAL;
+
+			double backX = 0.0;
+			double backZ = 0.0;
+			if (state != null && state.swept) {
+				backX = player.x - state.sweptX;
+				backZ = player.z - state.sweptZ;
+			}
+			if (state != null) {
+				state.sweptX = player.x;
+				state.sweptZ = player.z;
+				state.swept = true;
+			}
+
+			boolean found = sweep(player, world, scale, destroy, backX, backZ);
+			if (state != null) state.inLeaves = found;
+			if (!found) return;
+		} else if (!state.inLeaves) {
+			return;
+		}
+
+		if (keep == 1.0) return;
 		player.xd *= keep;
 		player.zd *= keep;
 
@@ -110,6 +122,8 @@ public final class Foliage {
 		double sweptX;
 		double sweptZ;
 		boolean swept;
+
+		boolean inLeaves;
 	}
 
 	public interface Walker {

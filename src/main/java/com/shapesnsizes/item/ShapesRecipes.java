@@ -26,9 +26,16 @@ public final class ShapesRecipes {
 			.addInput(dye(DyeColor.ORANGE))
 			.create("brownie_small", new ItemStack(ShapesItems.BROWNIE_SMALL, 2));
 
+		RecipeBuilder.Furnace(ShapesNSizes.MOD_ID)
+			.setInput(ShapesItems.BROWNIE_BIG)
+			.create("brownie_big_charred", new ItemStack(ShapesItems.BROWNIE_BIG_CHARRED, 1));
+		RecipeBuilder.Furnace(ShapesNSizes.MOD_ID)
+			.setInput(ShapesItems.BROWNIE_SMALL)
+			.create("brownie_small_charred", new ItemStack(ShapesItems.BROWNIE_SMALL_CHARRED, 1));
+
 		ShapesDoors.registerRecipes();
 		Registries.RECIPES.invalidateCaches();
-		ShapesNSizes.LOGGER.info("Registered 2 brownie recipes.");
+		ShapesNSizes.LOGGER.info("Registered 4 brownie recipes.");
 	}
 
 	private static ItemStack dye(DyeColor color) {

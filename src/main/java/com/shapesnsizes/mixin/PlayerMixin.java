@@ -8,9 +8,11 @@ import com.shapesnsizes.Piggyback;
 import com.shapesnsizes.PlayerScale;
 import com.shapesnsizes.PortalSized;
 import com.shapesnsizes.PortalSizes;
+import com.shapesnsizes.Reach;
 import com.shapesnsizes.Ridable;
 import com.shapesnsizes.ScaledPlayer;
 import com.shapesnsizes.SizeTicker;
+import com.shapesnsizes.Surface;
 import com.shapesnsizes.Trample;
 import net.minecraft.core.block.Block;
 import net.minecraft.core.block.material.Materials;
@@ -18,6 +20,7 @@ import net.minecraft.core.entity.Entity;
 import net.minecraft.core.entity.Mob;
 import net.minecraft.core.entity.player.Player;
 import net.minecraft.core.item.ItemStack;
+import net.minecraft.core.player.inventory.menu.MenuAbstract;
 import net.minecraft.core.util.helper.DamageType;
 import net.minecraft.core.util.helper.MathHelper;
 import net.minecraft.core.world.World;
@@ -96,6 +99,9 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 
 	@Unique
 	private double shapesnsizes$sinceFootfall = 0.0;
+
+	@Unique
+	private double shapesnsizes$sinceSplash = 0.0;
 
 	@Unique
 	private boolean shapesnsizes$leftFoot = false;
@@ -381,6 +387,21 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 		return MathHelper.aabbGrow(box, margin, margin * 0.5, margin, out);
 	}
 
+	@Redirect(
+		method = "tick",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/player/inventory/menu/MenuAbstract;stillValid(Lnet/minecraft/core/entity/player/Player;)Z")
+	)
+	private boolean shapesnsizes$containerStaysInReach(MenuAbstract menu, Player player) {
+		float f = PlayerScale.abilityFactor(player);
+		if (f <= 1.0f) return menu.stillValid(player);
+		Reach.begin(player, f);
+		try {
+			return menu.stillValid(player);
+		} finally {
+			Reach.end();
+		}
+	}
+
 	@Override
 	public void positionRider() {
 		if (this.passenger instanceof Player) {
@@ -411,6 +432,8 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 			if (PlayerScale.isSurfaceBroken(self)) PlayerScale.setSurfaceBroken(self, false);
 		}
 
+		if (water == null || !PlayerScale.canWaterWalk(self)) this.shapesnsizes$sinceSplash = 0.0;
+
 		if (!PlayerScale.isWaterWalker(self)) return;
 		if (PlayerScale.isSurfaceBroken(self)) return;
 		if (this.isSneaking()) {
@@ -423,6 +446,9 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 			this.shapesnsizes$jumpedSinceSupported = false;
 			return;
 		}
+
+		shapesnsizes$surfaceWake(self);
+
 		if (this.isMultiplayerEntity) return;
 
 		double surface = water.y + 1.0;
@@ -433,6 +459,24 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 		if (this.yd < 0.0) this.yd = 0.0;
 		this.onGround = true;
 		this.fallDistance = 0.0f;
+	}
+
+	@Unique
+	private void shapesnsizes$surfaceWake(Player self) {
+		if (this.isInWater()) {
+			this.shapesnsizes$sinceSplash = 0.0;
+			return;
+		}
+
+		double stepX = this.shapesnsizes$stepX;
+		double stepZ = this.shapesnsizes$stepZ;
+		Surface.wake(self, stepX, stepZ);
+
+		this.shapesnsizes$sinceSplash += Math.sqrt(stepX * stepX + stepZ * stepZ);
+		if (this.shapesnsizes$sinceSplash >= Surface.strideLength(self)) {
+			this.shapesnsizes$sinceSplash = 0.0;
+			Surface.step(self);
+		}
 	}
 
 	@Unique

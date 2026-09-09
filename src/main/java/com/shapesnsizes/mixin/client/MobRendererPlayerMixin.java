@@ -158,7 +158,7 @@ public class MobRendererPlayerMixin {
 		at = @At("HEAD")
 	)
 	private void shapesnsizes$drawAlgae(TessellatorGeneral tessellator, Player player, double x, double y, double z, CallbackInfo ci) {
-		if (!PlayerScale.canWaterWalk(player) || player.world == null) return;
+		if (!PlayerScale.showsAlgaeRaft(player) || player.world == null) return;
 		if (PlayerScale.waterUnderfoot(player) == null) return;
 		if (this.shapesnsizes$algaeContainer == null || this.shapesnsizes$algaeContainer.world != player.world) {
 			this.shapesnsizes$algaeContainer = new BlocksContainer(player.world);

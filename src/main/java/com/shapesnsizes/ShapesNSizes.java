@@ -29,7 +29,7 @@ public class ShapesNSizes implements ModInitializer {
 		CommonEvents.BEFORE_GAME_START.listen(key, ShapesDoors::register);
 		CommonEvents.AFTER_GAME_START.listen(key, this::onRecipesReady);
 		CommonEvents.RECIPES_NAMESPACE_INIT.listen(key, this::onRecipeNamespace);
-		LOGGER.info("Shapes n Sizes ready -- /scaling set <player> <scale>");
+		LOGGER.info("Shapes n Sizes ready -- /size <player> <scale>");
 	}
 
 	private boolean recipesRegistered = false;

@@ -76,11 +76,13 @@ public class ScalingCommand implements CommandManager.CommandRegistry {
 
 		LiteralCommandNode<CommandSource> node = dispatcher.register(root);
 
-		ArgumentBuilderLiteral<CommandSource> alias = ArgumentBuilderLiteral.literal("scale");
-		alias.requires(CommandSource::hasAdmin);
-		alias.redirect(node);
-		alias.executes(this::usage);
-		dispatcher.register(alias);
+		for (String name : new String[]{"scale", "size"}) {
+			ArgumentBuilderLiteral<CommandSource> alias = ArgumentBuilderLiteral.literal(name);
+			alias.requires(CommandSource::hasAdmin);
+			alias.redirect(node);
+			alias.executes(this::usage);
+			dispatcher.register(alias);
+		}
 
 		ArgumentBuilderLiteral<CommandSource> brownieAlias = ArgumentBuilderLiteral.literal("browniereset");
 		brownieAlias.requires(CommandSource::hasAdmin);
@@ -138,16 +140,15 @@ public class ScalingCommand implements CommandManager.CommandRegistry {
 
 	private int usage(CommandContext<CommandSource> c) {
 		CommandSource s = c.getSource();
-		s.sendMessage("§eShapes n Sizes §7— §f/scale §7is short for §f/scaling");
-		s.sendMessage("§f/scale <scale> §7- yourself. 1 is normal, " + PlayerScale.format(PlayerScale.MIN) + " to " + PlayerScale.format(PlayerScale.MAX));
-		s.sendMessage("§f/scale <players> <scale> §7- someone else");
-		s.sendMessage("§f/scale reset §7- yourself back to normal");
-		s.sendMessage("§f/scaling set <players> <scale>");
-		s.sendMessage("§f/scaling get [players]");
-		s.sendMessage("§f/scaling reset <players>");
-		s.sendMessage("§f/scaling setabilityscaling <percent> §7- how much speed, reach and jump follow size");
-		s.sendMessage("§f/scaling getabilityscaling");
-		s.sendMessage("§f/scaling reload §7- re-read config/shapesnsizes.properties");
+		s.sendMessage("§eShapes n Sizes §7— §f/size§7, §f/scale §7and §f/scaling §7are the same command");
+		s.sendMessage("§f/size <scale> §7- yourself. 1 is normal, " + PlayerScale.format(PlayerScale.MIN) + " to " + PlayerScale.format(PlayerScale.MAX));
+		s.sendMessage("§f/size <players> <scale> §7- someone else");
+		s.sendMessage("§f/size reset §7[players] §7- back to normal");
+		s.sendMessage("§f/size get §7[players] §7- report");
+		s.sendMessage("§f/size browniereset §7[players] §7- wear off everything eaten");
+		s.sendMessage("§f/size setabilityscaling <percent> §7- how much speed, reach and jump follow size");
+		s.sendMessage("§f/size getabilityscaling");
+		s.sendMessage("§f/size reload §7- re-read config/shapesnsizes.properties");
 		return 1;
 	}
 
@@ -181,7 +182,7 @@ public class ScalingCommand implements CommandManager.CommandRegistry {
 	private int applyToSelf(CommandContext<CommandSource> c, float scale) {
 		Player self = c.getSource().getSender();
 		if (self == null) {
-			c.getSource().sendMessage("§cName a player: §f/scaling set <players> <scale>");
+			c.getSource().sendMessage("§cName a player: §f/size <players> <scale>");
 			return 0;
 		}
 		return applyTo(c, Collections.singletonList(self), scale);
@@ -220,7 +221,7 @@ public class ScalingCommand implements CommandManager.CommandRegistry {
 	private int getSelf(CommandContext<CommandSource> c) {
 		Player self = c.getSource().getSender();
 		if (self == null) {
-			c.getSource().sendMessage("§cName a player: /scaling get <players>");
+			c.getSource().sendMessage("§cName a player: §f/size get <players>");
 			return 0;
 		}
 		report(c, self);

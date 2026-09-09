@@ -18,8 +18,9 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
   wide as your stance and growing with the drop. Stone and anything built is left alone.
 - From 3.5x you tread on anything much smaller than you, mobs and players alike, either by coming
   down on them or by walking into them. The damage starts small at the threshold and climbs.
-- From 2x you push through leaves the way you push through a cobweb. At 5x the branches break as
-  you go, at 9x the trunks come down too.
+- From 2x you push through leaves the way you push through a cobweb. The canopy eases off as you
+  grow and stops holding you back at all by 6x. At 5x the branches break as you go, at 9x the
+  trunks come down too.
 - From 6x, shallow water is held aside so you can wade a stream. A lake still closes over you, and
   standing still lets it close in.
 - Cactus spines stop reaching you at 4x. Magma, brimthaw and hot boulders stop setting you alight
@@ -32,20 +33,24 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 ## Being small
 
 - You never trample farmland, and monsters overlook you in favour of whoever is standing behind you.
-- Hold algae to walk on water. The surface is as slippery as ice while it holds. Sneaking,
-  jumping onto it or taking a hit drops you through, and you have to reach dry land before it
-  will hold you again.
-- Placed algae holds you up too, from half size, so a line of it is a bridge.
+- You walk on water. Nothing to hold and nothing to craft: at half size or under the surface simply
+  carries you, and it is as slippery as ice while it does. Every step squeaks and leaves a wake
+  trailing behind you. Sneaking, jumping onto it or taking a hit drops you through, and you have to
+  reach dry land before it will hold you again.
+- Placed algae holds you up too, from half size, so a line of it is a bridge that still works after
+  you have gone through the surface. Carry a piece and you stand on the leaf.
 - Hold paper to glide down slowly and land unhurt from any height.
 - At half size or under you climb sheer walls, either by crouching against one or by holding a
   slimeball to climb at a walk.
 - Leaves let you slip between the branches instead of holding you up.
 - At a quarter size or under, buttons, levers, torches and flags have collision, in the shape they
   are drawn.
-- Tall grass and snow layers slow you down. Roses draw blood at a third size. Rain is deep enough
-  to drown in, unless you are wearing a helmet or standing under something.
+- Snow layers slow you down. Tall grass starts to below two fifths size, barely at first and more
+  the smaller you get. Roses draw blood at a third size. Rain is deep enough to drown in, unless you
+  are wearing a helmet or standing under something.
 - Leather boots keep you on top of snow layers instead of sinking into them, from half size.
 - Pressure plates stop noticing you: stone plates at three quarters size, every plate at half.
+- Climbing out of water is a hop the size of your own legs rather than a launch across the pond.
 
 ## Either way
 
@@ -91,26 +96,26 @@ about a second and a half rather than happening at once.
 | Growing (makes 2) | cocoa beans, wheat, sugar, lapis lazuli |
 | Shrinking (makes 2) | cocoa beans, wheat, sugar, orange dye |
 
-A brownie's size is kept separate from the size `/scale` sets. It survives relogging but wears off
+A brownie's size is kept separate from the size `/size` sets. It survives relogging but wears off
 when you die, leaving you at whatever the command last gave you. Eating cannot take you past the
 usual `0.1` to `16` range.
 
 ## Commands
 
-Operator only. `/scale` and `/scaling` are the same command under two names, the way BTA's own
-`/gamerule` also answers to `/gr`.
+Operator only. `/size`, `/scale` and `/scaling` are one command under three names, the way BTA's own
+`/gamerule` also answers to `/gr`. Anything below works under any of them.
 
 | Command | What it does |
 | --- | --- |
-| `/scale <scale>` | Set your own size. `1` is normal, `0.1` to `16` accepted. |
-| `/scale reset` | Put yourself back to normal size. |
-| `/scale <player> <scale>` | Set someone else's size. Selectors such as `@a` work. |
-| `/scaling set <player> <scale>` | The same thing, spelled out. |
-| `/scaling get [player]` | Show a player's current size. |
-| `/scaling reset <player>` | Put a player back to normal size. |
-| `/scaling setabilityscaling <percent>` | How much of a size change carries over to speed, reach and jump. |
-| `/scaling getabilityscaling` | Show the current ability scaling. |
-| `/scaling reload` | Re-read the config without restarting. |
+| `/size <scale>` | Set your own size. `1` is normal, `0.1` to `16` accepted. |
+| `/size reset` | Put yourself back to normal size. |
+| `/size <player> <scale>` | Set someone else's size. Selectors such as `@a` work. |
+| `/size set <player> <scale>` | The same thing, spelled out. |
+| `/size get [player]` | Show a player's current size. |
+| `/size reset <player>` | Put a player back to normal size. |
+| `/size setabilityscaling <percent>` | How much of a size change carries over to speed, reach and jump. |
+| `/size getabilityscaling` | Show the current ability scaling. |
+| `/size reload` | Re-read the config without restarting. |
 
 ## Game rules
 
@@ -162,8 +167,8 @@ player.AnotherPlayer = 3
 These apply on login, and only to a player the server has no size on record for. A named entry
 beats everything; then `starting-size` in `server.properties`, then `default-scale`, then the
 world's `startingSize` rule, each passing when it says normal. After that everyone keeps whatever
-size they have, so `/scale` sticks and nobody springs back on reconnect.
-Run `/scaling reload` to pick up edits without a restart.
+size they have, so `/size` sticks and nobody springs back on reconnect.
+Run `/size reload` to pick up edits without a restart.
 
 ## Install
 

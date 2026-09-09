@@ -12,9 +12,6 @@ import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(value = BlockLogicTallGrass.class, remap = false)
 public abstract class BlockLogicTallGrassMixin extends BlockLogic {
-
-	private static final double BASE_DRAG = 0.7;
-
 	protected BlockLogicTallGrassMixin(Block<?> block, Material material) {
 		super(block, material);
 	}
@@ -22,7 +19,7 @@ public abstract class BlockLogicTallGrassMixin extends BlockLogic {
 	@Override
 	public void onEntityCollision(World world, TilePosc tilePos, Entity entity) {
 		super.onEntityCollision(world, tilePos, entity);
-		double drag = PlayerScale.thickenDrag(entity, BASE_DRAG);
+		double drag = PlayerScale.undergrowthDrag(entity);
 		if (drag == 1.0) return;
 		entity.xd *= drag;
 		entity.zd *= drag;

@@ -73,6 +73,13 @@ public abstract class MobMixin {
 		return speed * shapesnsizes$climbScale();
 	}
 
+	@ModifyConstant(method = "moveEntityWithHeading", constant = @Constant(doubleValue = 0.3))
+	private double shapesnsizes$fluidExitHop(double hop) {
+		Mob self = (Mob) (Object) this;
+		if (!(self instanceof Player)) return hop;
+		return PlayerScale.fluidExitHop((Player) self);
+	}
+
 	@Unique
 	private float shapesnsizes$climbScale() {
 		Mob self = (Mob) (Object) this;
