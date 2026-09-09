@@ -33,6 +33,9 @@ public class ShapesNSizesClient implements ClientModInitializer {
 	public static final OptionBoolean CRAWL_TOGGLE =
 		GameSettings.register(new OptionBoolean("shapesnsizesCrawlToggle", false));
 
+	public static final KeyBinding KEY_CURSOR =
+		GameSettings.register(new KeyBinding("key.shapesnsizes.cursor").setDefault(InputDevice.keyboard, Keyboard.KEY_V));
+
 	@Override
 	public void onInitializeClient() {
 		Key key = Key.of(ShapesNSizes.MOD_ID);
@@ -118,10 +121,11 @@ public class ShapesNSizesClient implements ClientModInitializer {
 		try {
 			OptionsPages.CONTROLS.withComponent(new OptionsCategory("gui.options.page.controls.category.shapesnsizes")
 				.withComponent(new KeyBindingComponent(KEY_CRAWL))
-				.withComponent(new BooleanOptionComponent(CRAWL_TOGGLE)));
+				.withComponent(new BooleanOptionComponent(CRAWL_TOGGLE))
+				.withComponent(new KeyBindingComponent(KEY_CURSOR)));
 		} catch (Throwable t) {
 
-			ShapesNSizes.LOGGER.warn("Could not add the crawl controls to the options screen", t);
+			ShapesNSizes.LOGGER.warn("Could not add the mod's controls to the options screen", t);
 		}
 	}
 }

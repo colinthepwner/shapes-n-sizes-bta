@@ -18,6 +18,7 @@ public final class PlayerScale {
 	public static final int CRAWL_ID = 22;
 	public static final int BONUS_ID = 23;
 	public static final int EASED_ID = 24;
+	public static final int CURSOR_ID = 25;
 	public static final String TAG = "ShapesScale";
 	public static final String BONUS_TAG = "ShapesBonus";
 	public static final float MIN = 0.1f;
@@ -36,6 +37,7 @@ public final class PlayerScale {
 		data.define(BONUS_ID, 0, Integer.class);
 
 		data.define(EASED_ID, -1, Integer.class);
+		data.define(CURSOR_ID, (byte) 0, Byte.class);
 	}
 
 	public static final float CRAWL_HEIGHT = 0.6f;
@@ -55,6 +57,23 @@ public final class PlayerScale {
 		if (player == null) return;
 		try {
 			player.getEntityData().set(CRAWL_ID, (byte) (crawling ? 1 : 0));
+		} catch (RuntimeException ignored) {
+		}
+	}
+
+	public static boolean isCursorOn(Player player) {
+		if (player == null) return false;
+		try {
+			return player.getEntityData().getByte(CURSOR_ID) != 0;
+		} catch (RuntimeException e) {
+			return false;
+		}
+	}
+
+	public static void setCursorOn(Player player, boolean on) {
+		if (player == null) return;
+		try {
+			player.getEntityData().set(CURSOR_ID, (byte) (on ? 1 : 0));
 		} catch (RuntimeException ignored) {
 		}
 	}

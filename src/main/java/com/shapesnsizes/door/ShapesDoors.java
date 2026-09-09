@@ -142,8 +142,13 @@ public final class ShapesDoors {
 		RecipeBuilder.Shaped(ns).setShape("S", "D").addInput('S', DOOR_SHORT).addInput('D', DOOR_TALL)
 			.create("door_verytall_from_short", new ItemStack(DOOR_VERY_TALL, 1));
 
+		RecipeBuilder.Shaped(ns).setShape("S", "S").addInput('S', DOOR_SHORT)
+			.create("door_from_shorts", new ItemStack(Items.DOOR_OAK, 1));
+		RecipeBuilder.Shaped(ns).setShape("D", "D").addInput('D', Items.DOOR_OAK)
+			.create("door_verytall_from_doors", new ItemStack(DOOR_VERY_TALL, 1));
+
 		registerDyedRecipes(ns);
-		ShapesNSizes.LOGGER.info("Registered {} door recipes.", 6 + DyeColor.COLOR_AMOUNT * 6 + 3);
+		ShapesNSizes.LOGGER.info("Registered {} door recipes.", 8 + DyeColor.COLOR_AMOUNT * 8 + 3);
 	}
 
 	private static void registerDyedRecipes(String ns) {
@@ -172,6 +177,11 @@ public final class ShapesDoors {
 			RecipeBuilder.Shaped(ns).setShape("S", "D")
 				.addInput('S', DOOR_SHORT_PAINTED, item).addInput('D', DOOR_TALL_PAINTED, item)
 				.create(c + "_door_verytall_from_short", new ItemStack(DOOR_VERY_TALL_PAINTED, 1, item));
+
+			RecipeBuilder.Shaped(ns).setShape("S", "S").addInput('S', DOOR_SHORT_PAINTED, item)
+				.create(c + "_door_from_shorts", new ItemStack(Items.DOOR_OAK_PAINTED, 1, item));
+			RecipeBuilder.Shaped(ns).setShape("D", "D").addInput('D', Items.DOOR_OAK_PAINTED, item)
+				.create(c + "_door_verytall_from_doors", new ItemStack(DOOR_VERY_TALL_PAINTED, 1, item));
 		}
 
 		dyeing(ns, "door_short", DOOR_SHORT, DOOR_SHORT_PAINTED);

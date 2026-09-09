@@ -22,3 +22,5 @@ gamerule.starting_size.value.x2=2x
 gamerule.starting_size.value.x2_5=2.5x
 gamerule.do_size_drag.name=Size Drag
 gamerule.do_size_drag.desc=If enabled, terrain is harder going at some sizes: undergrowth and snow hold a small player back, and a leaf canopy holds a big one back. Disabled, ground cover costs everybody the same and only the body's own speed differs. Does not stop a large player breaking the trees they walk through -- that is Size Griefing.
+gamerule.do_size_scaled_cursor.name=Size Scaled Cursor
+gamerule.do_size_scaled_cursor.desc=If enabled, a player twice normal size or more can mine and place a square of blocks at once, as wide as they are: 2x2 at 2x, 3x3 at 3x. It costs the full price either way -- the mining takes as long, the tool wears by as many points and the blocks cost as many items -- so it changes how much of a job happens per swing and nothing else. Off by default, and each player still has to switch it on with their own key.

@@ -2,6 +2,7 @@ package com.shapesnsizes.mixin;
 
 import com.mojang.nbt.tags.CompoundTag;
 import com.shapesnsizes.Behemoth;
+import com.shapesnsizes.Cursor;
 import com.shapesnsizes.Foliage;
 import com.shapesnsizes.Wading;
 import com.shapesnsizes.Piggyback;
@@ -185,6 +186,17 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 
 		double height = bb.maxY() - bb.minY() + 0.025;
 		((AABBd) bb).maxY = bb.minY() + height * s - 0.025;
+	}
+
+	@Shadow protected abstract boolean boundsClear(AABBdc bounds);
+
+	@Redirect(
+		method = "tick",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/entity/player/Player;boundsClear(Lorg/joml/primitives/AABBdc;)Z")
+	)
+	private boolean shapesnsizes$noMidAirFold(Player self, AABBdc bounds) {
+		if (!this.onGround && PlayerScale.get(self) > PlayerScale.DEFAULT) return true;
+		return this.boundsClear(bounds);
 	}
 
 	@Inject(method = "onLivingUpdate", at = @At("TAIL"))
@@ -520,10 +532,12 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 	private void shapesnsizes$scaleBreakSpeed(CallbackInfoReturnable<Float> cir) {
 		float str = cir.getReturnValueF();
 		if (str <= 0.0f) return;
-		float f = PlayerScale.abilityFactor((Player) (Object) this);
-		if (f != 1.0f) {
-			cir.setReturnValue(str * (float) Math.sqrt(f));
-		}
+		Player self = (Player) (Object) this;
+		float f = PlayerScale.abilityFactor(self);
+		if (f != 1.0f) str *= (float) Math.sqrt(f);
+		int blocks = Cursor.blocks(self);
+		if (blocks > 1) str /= blocks;
+		if (str != cir.getReturnValueF()) cir.setReturnValue(str);
 	}
 
 	@Unique

@@ -24,6 +24,9 @@ public final class ScalingRules {
 	public static final GameRuleBoolean SIZE_DRAG =
 		GameRules.register(new GameRuleBoolean("doSizeDrag", "gamerule.do_size_drag", true));
 
+	public static final GameRuleBoolean SCALED_CURSOR =
+		GameRules.register(new GameRuleBoolean("doSizeScaledCursor", "gamerule.do_size_scaled_cursor", false));
+
 	public static final GameRuleEnum<StartingSize> STARTING_SIZE =
 		GameRules.register(new GameRuleEnum<>("startingSize", "gamerule.starting_size", StartingSize.NORMAL));
 

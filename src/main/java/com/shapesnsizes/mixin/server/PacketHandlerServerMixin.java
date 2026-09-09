@@ -1,6 +1,7 @@
 package com.shapesnsizes.mixin.server;
 
 import com.shapesnsizes.Crawl;
+import com.shapesnsizes.Cursor;
 import com.shapesnsizes.ModVersion;
 import com.shapesnsizes.PlayerScale;
 import com.shapesnsizes.ShapesConfig;
@@ -57,6 +58,9 @@ public abstract class PacketHandlerServerMixin {
 	private void shapesnsizes$crawlState(PacketUpdatePlayerState packet, CallbackInfo ci) {
 		if (packet.state == Crawl.STATE_CRAWL) PlayerScale.setCrawling(this.playerEntity, true);
 		else if (packet.state == Crawl.STATE_UNCRAWL) PlayerScale.setCrawling(this.playerEntity, false);
+
+		else if (packet.state == Cursor.STATE_ON) PlayerScale.setCursorOn(this.playerEntity, true);
+		else if (packet.state == Cursor.STATE_OFF) PlayerScale.setCursorOn(this.playerEntity, false);
 	}
 
 	@Redirect(

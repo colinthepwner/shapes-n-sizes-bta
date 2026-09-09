@@ -54,14 +54,18 @@
     "client.HudComponentOxygenBarMixin",
     "client.EntityRendererDispatcherMixin",
     "client.EntityRendererMixin",
-    "client.PacketHandlerClientMixin"
+    "client.PacketHandlerClientMixin",
+    "client.PlayerControllerMixin",
+    "client.PlayerControllerSPMixin",
+    "client.RenderGlobalMixin"
   ],
   "server": [
     "server.MinecraftServerMixin",
     "server.PacketHandlerServerMixin",
     "server.PlayerServerMixin",
     "server.PlayerListMixin",
-    "server.EntityTrackerEntryImplMixin"
+    "server.EntityTrackerEntryImplMixin",
+    "server.ServerPlayerControllerMixin"
   ],
   "injectors": {
     "defaultRequire": 1
