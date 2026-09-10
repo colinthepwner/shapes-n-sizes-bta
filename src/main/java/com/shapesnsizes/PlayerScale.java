@@ -1,6 +1,7 @@
 package com.shapesnsizes;
 
 import net.minecraft.core.block.Block;
+import net.minecraft.core.block.BlockLogicFluid;
 import net.minecraft.core.block.Blocks;
 import net.minecraft.core.block.tag.BlockTags;
 import net.minecraft.core.entity.player.Player;
@@ -498,8 +499,10 @@ public final class PlayerScale {
 		return held != null && held.itemID == itemID;
 	}
 
+	public static final float FILM = 0.4f;
+
 	public static boolean isWaterWalker(Player player) {
-		return player != null && isSmall(player);
+		return player != null && get(player) <= FILM;
 	}
 
 	public static boolean canClimbWalls(Player player) {
@@ -563,14 +566,28 @@ public final class PlayerScale {
 	public static TilePos waterUnderfoot(Player player) {
 		if (player.world == null) return null;
 		int bx = MathHelper.floor(player.x);
-		int by = MathHelper.floor(player.y - 0.05);
 		int bz = MathHelper.floor(player.z);
+
+		TilePos probe = shapesnsizes$waterSurfaceAt(player, bx, MathHelper.floor(player.y), bz);
+		if (probe == null) probe = shapesnsizes$waterSurfaceAt(player, bx, MathHelper.floor(player.y - 0.05), bz);
+		return probe;
+	}
+
+	private static TilePos shapesnsizes$waterSurfaceAt(Player player, int bx, int by, int bz) {
 		TilePos probe = new TilePos(bx, by, bz);
 		Block<?> below = player.world.getBlockType(probe);
 		if (below == null || !below.hasTag(BlockTags.IS_WATER)) return null;
 		Block<?> above = player.world.getBlockType(new TilePos(bx, by + 1, bz));
 		if (above != null && above.hasTag(BlockTags.IS_WATER)) return null;
 		return probe;
+	}
+
+	public static double waterSurface(World world, TilePos pos) {
+		if (world == null || pos == null) return 1.0;
+		Block<?> block = world.getBlockType(pos);
+		if (block == null) return 1.0;
+		if (!(block.getLogic() instanceof BlockLogicFluid)) return 1.0;
+		return ((BlockLogicFluid) block.getLogic()).getFluidHeight(world, pos);
 	}
 
 	public static boolean isSnowWalker(Player player) {

@@ -104,6 +104,9 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 	@Unique
 	private double shapesnsizes$sinceSplash = 0.0;
 
+	private static final double SURFACE_BELOW = 0.2;
+	private static final double SURFACE_ABOVE = 0.05;
+
 	@Unique
 	private boolean shapesnsizes$leftFoot = false;
 
@@ -459,11 +462,11 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 			return;
 		}
 
-		shapesnsizes$surfaceWake(self);
+		double surface = water.y + PlayerScale.waterSurface(this.world, water);
+		shapesnsizes$surfaceWake(self, surface);
 
 		if (this.isMultiplayerEntity) return;
 
-		double surface = water.y + 1.0;
 		if (this.y < surface) {
 			this.y = surface;
 			this.setBounds();
@@ -474,8 +477,8 @@ public abstract class PlayerMixin extends Mob implements ScaledPlayer, PortalSiz
 	}
 
 	@Unique
-	private void shapesnsizes$surfaceWake(Player self) {
-		if (this.isInWater()) {
+	private void shapesnsizes$surfaceWake(Player self, double surface) {
+		if (this.y > surface + SURFACE_ABOVE || this.y < surface - SURFACE_BELOW) {
 			this.shapesnsizes$sinceSplash = 0.0;
 			return;
 		}

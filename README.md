@@ -33,12 +33,13 @@ sized in both views, so a giant turns over a sugar cube and a tiny player hauls 
 ## Being small
 
 - You never trample farmland, and monsters overlook you in favour of whoever is standing behind you.
-- You walk on water. Nothing to hold and nothing to craft: at half size or under the surface simply
-  carries you, and it is as slippery as ice while it does. Every step squeaks and leaves a wake
-  trailing behind you. Sneaking, jumping onto it or taking a hit drops you through, and you have to
-  reach dry land before it will hold you again.
-- Placed algae holds you up too, from half size, so a line of it is a bridge that still works after
-  you have gone through the surface. Carry a piece and you stand on the leaf.
+- You walk on water. Nothing to hold and nothing to craft: at two fifths size or under the surface
+  simply carries you, and it is as slippery as ice while it does. Every step squeaks and leaves a
+  wake trailing behind you. Sneaking, jumping onto it or taking a hit drops you through, and you
+  have to reach dry land before it will hold you again.
+- Placed algae holds you up from half size, which is looser than the water itself: between two
+  fifths and half size a leaf will carry you and the water will not. It also still works after you
+  have gone through the surface, so a line of it is a bridge. Carry a piece and you stand on the leaf.
 - Hold paper to glide down slowly and land unhurt from any height.
 - At half size or under you climb sheer walls, either by crouching against one or by holding a
   slimeball to climb at a walk.
