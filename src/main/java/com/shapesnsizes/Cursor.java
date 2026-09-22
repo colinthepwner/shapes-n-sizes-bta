@@ -35,10 +35,17 @@ public final class Cursor {
 	public static int blocks(Player player) {
 		if (!enabled(player)) return 1;
 		int e = edge(player);
-		return e * e;
+		return e * e * e;
 	}
 
-	public static TilePos[] square(Player player, int x, int y, int z, Side side) {
+	public enum Depth {
+
+		INTO,
+
+		OUT_OF
+	}
+
+	public static TilePos[] cube(Player player, int x, int y, int z, Side side, Depth depth) {
 		if (!enabled(player) || side == null) return null;
 		int n = edge(player);
 
@@ -59,29 +66,41 @@ public final class Cursor {
 			vx = 0; vy = 1; vz = 0;
 		}
 
+		int sign = depth == Depth.INTO ? -1 : 1;
+		int wx = side.offsetX() * sign;
+		int wy = side.offsetY() * sign;
+		int wz = side.offsetZ() * sign;
+
 		int lo = -((n - 1) / 2);
-		TilePos[] out = new TilePos[n * n];
+		TilePos[] out = new TilePos[n * n * n];
 		int i = 1;
 		for (int a = lo; a < lo + n; ++a) {
 			for (int b = lo; b < lo + n; ++b) {
-				int px = x + ux * a + vx * b;
-				int py = y + uy * a + vy * b;
-				int pz = z + uz * a + vz * b;
-				if (px == x && py == y && pz == z) {
-					out[0] = new TilePos(px, py, pz);
-				} else {
-					out[i++] = new TilePos(px, py, pz);
+
+				for (int d = 0; d < n; ++d) {
+					int px = x + ux * a + vx * b + wx * d;
+					int py = y + uy * a + vy * b + wy * d;
+					int pz = z + uz * a + vz * b + wz * d;
+					if (a == 0 && b == 0 && d == 0) {
+						out[0] = new TilePos(px, py, pz);
+					} else {
+						out[i++] = new TilePos(px, py, pz);
+					}
 				}
 			}
 		}
 		return out;
 	}
 
-	public static TilePos[] around(Player player, int x, int y, int z, Side side) {
-		TilePos[] all = square(player, x, y, z, side);
+	public static TilePos[] around(Player player, int x, int y, int z, Side side, Depth depth) {
+		TilePos[] all = cube(player, x, y, z, side, depth);
 		if (all == null || all.length < 2) return null;
 		TilePos[] rest = new TilePos[all.length - 1];
 		System.arraycopy(all, 1, rest, 0, rest.length);
 		return rest;
+	}
+
+	public static TilePos[] around(Player player, int x, int y, int z, Side side) {
+		return around(player, x, y, z, side, Depth.INTO);
 	}
 }

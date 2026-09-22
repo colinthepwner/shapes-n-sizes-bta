@@ -17,6 +17,8 @@ public final class ShapesItems {
 
 	public static final float STEP = 0.1f;
 
+	public static final float CHARRED_STEP = 0.06f;
+
 	public static Item BROWNIE_BIG;
 	public static Item BROWNIE_SMALL;
 

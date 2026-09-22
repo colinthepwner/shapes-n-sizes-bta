@@ -52,8 +52,8 @@ public class PlayerInputMixin implements CrawlInput {
 			player.sendStatusMessage("§7Scaled cursor on. Nothing to do below §f2x§7 size.");
 		} else {
 			int e = Cursor.edge(player);
-			player.sendStatusMessage("§7Scaled cursor §fon§7 — §f" + e + "x" + e + "§7, "
-				+ (e * e) + " blocks a swing.");
+			player.sendStatusMessage("§7Scaled cursor §fon§7 — §f" + e + "x" + e + "x" + e + "§7, "
+				+ (e * e * e) + " blocks a swing.");
 		}
 	}
 

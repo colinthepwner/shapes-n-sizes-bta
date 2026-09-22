@@ -1,23 +1,3 @@
-"""
-Writes a block model file for every door segment, in all four hinge/open combinations.
-
-The geometry and UVs are the game's own door models, copied face for face -- a door is a slab three
-pixels deep against one wall of the block, and which wall depends on the hinge and whether it is
-open. What changes here is only the texture each segment points at, since every block of a hand-
-drawn door has its own tile.
-
-Head and sill faces are only drawn where the door actually ends: the top of the topmost segment and
-the bottom of the bottom one. Drawing them on a middle segment would put a lid across the middle of
-a tall door.
-
-The dyed doors get the same treatment, one folder per colour, laid out the way the game lays its
-own painted doors out: the geometry is identical and only the texture path moves. They are written
-from the same table rather than as `parent` references to the plain models, because a segment's
-texture is named after the segment and a parent-and-override file would be the same size as the
-model it overrides.
-
-Run from the project root:  python tools/make_door_models.py
-"""
 import json
 import os
 
@@ -25,7 +5,6 @@ BASE = os.path.join("src", "main", "resources", "assets", "shapesnsizes", "model
 OUT = os.path.join(BASE, "planks")
 DOORS = [("short", 1), ("tall", 3), ("verytall", 4)]
 
-# DyeColor.colorID in block-metadata order, matching tools/make_dyed_door_art.py and ShapesDoors.
 COLORS = ["white", "orange", "magenta", "lightblue", "yellow", "lime", "pink", "gray",
           "silver", "cyan", "purple", "blue", "brown", "green", "red", "black"]
 
@@ -47,8 +26,6 @@ def model(texture, variant, cap_top, cap_bottom):
         faces["up"] = {"uv": UP_UV[variant], "texture": "#door", "cullface": "up", "rotation": 90}
     for face, uv in SIDES[variant].items():
         entry = {"uv": uv, "texture": "#door"}
-        # The east face is the one that meets the rest of the door frame; leaving it unculled
-        # matches the game's own models and stops the edge vanishing against a neighbour.
         if face != "east":
             entry["cullface"] = face
         faces[face] = entry
@@ -64,7 +41,6 @@ def model(texture, variant, cap_top, cap_bottom):
 
 
 def write_set(out_dir, texture_dir):
-    """One folder of models: every segment of every door, in all four hinge/open combinations."""
     os.makedirs(out_dir, exist_ok=True)
     written = 0
     for name, height in DOORS:

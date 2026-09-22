@@ -25,7 +25,7 @@ public abstract class PlayerControllerMixin {
 		if (world == null || world.isClientSide || player == null) return;
 
 		if (itemStack == null || itemStack.stackSize <= 0) return;
-		TilePos[] rest = Cursor.around(player, tilePos.x(), tilePos.y(), tilePos.z(), side);
+		TilePos[] rest = Cursor.around(player, tilePos.x(), tilePos.y(), tilePos.z(), side, Cursor.Depth.OUT_OF);
 		if (rest == null) return;
 
 		this.shapesnsizes$spreading = true;

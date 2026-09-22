@@ -46,7 +46,7 @@ public abstract class ServerPlayerControllerMixin {
 		if (entityplayer == null || world == null) return;
 
 		if (itemstack == null || itemstack.stackSize <= 0) return;
-		TilePos[] rest = Cursor.around(entityplayer, blockX, blockY, blockZ, side);
+		TilePos[] rest = Cursor.around(entityplayer, blockX, blockY, blockZ, side, Cursor.Depth.OUT_OF);
 		if (rest == null) return;
 
 		this.shapesnsizes$placing = true;

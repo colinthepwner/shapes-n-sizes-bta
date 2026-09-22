@@ -28,7 +28,7 @@ public abstract class PlayerControllerSPMixin {
 		if (!cir.getReturnValueZ() || this.shapesnsizes$spreading) return;
 		Player player = shapesnsizes$player();
 		if (player == null) return;
-		TilePos[] rest = Cursor.around(player, tilePos.x(), tilePos.y(), tilePos.z(), side);
+		TilePos[] rest = Cursor.around(player, tilePos.x(), tilePos.y(), tilePos.z(), side, Cursor.Depth.OUT_OF);
 		if (rest == null) return;
 
 		this.shapesnsizes$spreading = true;

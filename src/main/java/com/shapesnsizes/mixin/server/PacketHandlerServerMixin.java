@@ -6,9 +6,14 @@ import com.shapesnsizes.ModVersion;
 import com.shapesnsizes.PlayerScale;
 import com.shapesnsizes.ShapesConfig;
 import com.shapesnsizes.ShapesNSizes;
+import net.minecraft.core.entity.Entity;
 import net.minecraft.core.net.packet.PacketCustomPayload;
 import net.minecraft.core.net.packet.PacketUpdatePlayerState;
+import org.joml.Vector3d;
+import org.objectweb.asm.Opcodes;
+import org.spongepowered.asm.mixin.injection.Constant;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.ModifyConstant;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import net.minecraft.core.player.gamemode.Gamemode;
 import net.minecraft.server.entity.player.PlayerServer;
@@ -25,6 +30,8 @@ public abstract class PacketHandlerServerMixin {
 
 	@Shadow public abstract void kickPlayer(String reason);
 
+	@Shadow public boolean connectionClosed;
+
 	@Unique private int shapesnsizes$sinceJoin = 0;
 
 	@Unique private boolean shapesnsizes$answered = false;
@@ -34,6 +41,8 @@ public abstract class PacketHandlerServerMixin {
 	@Inject(method = "handlePackets", at = @At("TAIL"))
 	private void shapesnsizes$awaitVersion(CallbackInfo ci) {
 		if (this.shapesnsizes$answered || !ShapesConfig.requiresClientMod()) return;
+
+		if (this.connectionClosed || this.playerEntity == null) return;
 		if (++this.shapesnsizes$sinceJoin < HANDSHAKE_GRACE) return;
 		this.shapesnsizes$answered = true;
 		ShapesNSizes.LOGGER.info("{} joined without Shapes n Sizes; disconnecting them.",
@@ -41,13 +50,19 @@ public abstract class PacketHandlerServerMixin {
 		this.kickPlayer(ModVersion.KICK_MISSING);
 	}
 
-	@Inject(method = "handleCustomPayload", at = @At("HEAD"))
+	@Inject(method = "handleCustomPayload", at = @At("HEAD"), cancellable = true)
 	private void shapesnsizes$checkVersion(PacketCustomPayload packet, CallbackInfo ci) {
 		if (!ModVersion.CHANNEL.equals(packet.channel)) return;
 		this.shapesnsizes$answered = true;
 		String theirs = ModVersion.read(packet);
 		String ours = ModVersion.get();
 		if (ours.equals(theirs)) return;
+
+		if (this.connectionClosed || this.playerEntity == null) {
+			ci.cancel();
+			return;
+		}
+		ci.cancel();
 		ShapesNSizes.LOGGER.info("{} is running Shapes n Sizes {}, but this server is on {}; disconnecting them.",
 			this.playerEntity == null ? "A client" : this.playerEntity.username,
 			theirs.isEmpty() ? "an unknown version" : theirs, ours);
@@ -85,5 +100,42 @@ public abstract class PacketHandlerServerMixin {
 	)
 	private float shapesnsizes$entityReach(Gamemode gamemode) {
 		return gamemode.getEntityReachDistance() * PlayerScale.abilityFactor(this.playerEntity);
+	}
+
+	@Redirect(
+		method = "handlePlayerAction",
+		at = @At(
+			value = "FIELD",
+			target = "Lnet/minecraft/server/entity/player/PlayerServer;y:D",
+			opcode = Opcodes.GETFIELD
+		)
+	)
+	private double shapesnsizes$digFromTheEye(PlayerServer player) {
+		return player.y + player.getHeadHeight();
+	}
+
+	@Redirect(
+		method = "handleUseOrPlaceItem",
+		at = @At(value = "INVOKE", target = "Lnet/minecraft/server/entity/player/PlayerServer;distanceToSqr(DDD)D")
+	)
+	private double shapesnsizes$placeFromTheEye(PlayerServer player, double x, double y, double z) {
+		double dx = player.x - x;
+		double dy = player.y + player.getHeadHeight() - y;
+		double dz = player.z - z;
+		return dx * dx + dy * dy + dz * dz;
+	}
+
+	@ModifyConstant(method = "handleEntityInteract", constant = @Constant(doubleValue = 8.0))
+	private double shapesnsizes$seeAsFarAsTheyReach(double blocks) {
+		return blocks * PlayerScale.abilityFactor(this.playerEntity);
+	}
+
+	@Redirect(
+		method = "handleEntityInteract",
+		at = @At(value = "INVOKE", target = "Lorg/joml/Vector3d;add(DDD)Lorg/joml/Vector3d;")
+	)
+	private Vector3d shapesnsizes$aimFromTheEye(Vector3d look, double x, double y, double z) {
+		Entity player = this.playerEntity;
+		return look.add(x, y + player.getHeadHeight(), z);
 	}
 }

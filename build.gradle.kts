@@ -33,22 +33,16 @@ repositories {
 dependencies {
 	minecraft("::${libs.versions.bta.get()}")
 
-	// Required at compilation & runtime
 	implementation(libs.loader)
 	implementation(libs.halplibe)
 
-	// Ship HalpLibe inside the jar so the mod works on its own. Fabric treats a nested jar as one more
-	// candidate rather than an override: if the player already has HalpLibe, the loader picks whichever
-	// version is higher. Not transitive -- the loader and Minecraft it asks for are the game's own.
 	include(libs.halplibe) { isTransitive = false }
 
-	// Only required at compilation
 	compileOnly(libs.bundles.btaLwjgl)
 	compileOnly(libs.joml)
 	compileOnly(libs.joml.primitives)
 	compileOnly(libs.slf4jApi)
 
-	// Only required for development/launch at runtime, won't be part of any builds
 	localRuntime(libs.modMenu)
 	runtimeClasspath(libs.clientJar)
 	val lwjglVer = libs.versions.lwjgl.get()
@@ -103,18 +97,6 @@ tasks {
 	}
 }
 
-/**
- * Fails the build if a class under the mixin package is not listed in the mixin config.
- *
- * The config claims `com.shapesnsizes.mixin` wholesale, and the transformer treats every class it
- * loads from there as a mixin -- an ordinary class or interface parked in that package is not
- * ignored, it throws the moment something first touches it. That can be a long way into a session:
- * a helper interface only the in-world player code references got as far as a player's first world
- * before bringing the game down, having started and reached the title screen perfectly happily.
- *
- * A text match rather than anything clever: every mixin is named in the config, so the config is
- * the list, and anything in the package missing from it is the bug this catches.
- */
 val verifyMixinsRegistered by tasks.registering {
 	group = "verification"
 	description = "Fails if a class under the mixin package is missing from the mixin config."
@@ -145,7 +127,6 @@ val verifyMixinsRegistered by tasks.registering {
 tasks.named("check") { dependsOn(verifyMixinsRegistered) }
 tasks.named("build") { dependsOn(verifyMixinsRegistered) }
 
-// Removes all outdated manifest.json dependencies
 configurations.configureEach {
 	exclude(group = "org.lwjgl.lwjgl")
 	exclude(group = "net.java.jutils")
@@ -154,7 +135,7 @@ configurations.configureEach {
 	exclude(group = "net.minecraft", module = "launchwrapper")
 }
 
-fun resolveLwjglNatives(): String { // Sourced from https://www.lwjgl.org/
+fun resolveLwjglNatives(): String {
 	return Pair(
 		System.getProperty("os.name")!!,
 		System.getProperty("os.arch")!!

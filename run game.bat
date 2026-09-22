@@ -1,6 +1,4 @@
 @echo off
-rem Launches the BTA dev client with the mod loaded, straight from the source tree.
-rem Builds first if needed, then opens the game window. Close the game to end the script.
 setlocal
 cd /d "%~dp0"
 set USERNAME_ARG=%~1

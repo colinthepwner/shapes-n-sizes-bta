@@ -1,8 +1,4 @@
 @echo off
-rem Builds the mod, drops it into the server, and starts the server.
-rem The server lives outside this folder on purpose: a world being written to inside a folder that
-rem something else is syncing or indexing means constant re-reads and file locks, which is a good
-rem way to corrupt a save. This just points at it.
 setlocal
 cd /d "%~dp0"
 
@@ -16,8 +12,6 @@ if not exist "%SERVER_DIR%\server.jar" (
 )
 
 echo Building Shapes n Sizes ...
-rem Older jars pile up in build\libs across version bumps, and the wildcard install below
-rem would happily copy every one of them. Start from an empty folder so only this build exists.
 if exist "build\libs" rd /s /q "build\libs"
 call gradlew.bat build -q
 if errorlevel 1 (
@@ -28,11 +22,6 @@ if errorlevel 1 (
 )
 
 echo Installing the new jar ...
-rem The version is part of the file name and moves with gradle.properties. A hard-coded name here
-rem quietly installed whatever stale jar of that version was still lying in build\libs, so the
-rem server ran 1.0.0 for days while the client was on 1.0.2 and every "works in single player,
-rem not on the server" report was really this. Match by wildcard, skip the sources jar, and clear
-rem out any older copy first so the loader never sees two versions of the mod at once.
 del /q "%SERVER_DIR%\mods\shapesnsizes-*.jar" 2> nul
 set "INSTALLED="
 for %%f in ("build\libs\shapesnsizes-*.jar") do (
