@@ -4,10 +4,8 @@ import com.shapesnsizes.Cursor;
 import com.shapesnsizes.PlayerScale;
 import com.shapesnsizes.client.CrawlInput;
 import com.shapesnsizes.client.ShapesNSizesClient;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.PlayerInput;
 import net.minecraft.core.entity.player.Player;
-import net.minecraft.core.net.packet.PacketUpdatePlayerState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
@@ -41,8 +39,8 @@ public class PlayerInputMixin implements CrawlInput {
 
 		boolean want = !PlayerScale.isCursorOn(player);
 		PlayerScale.setCursorOn(player, want);
-		Minecraft.getMinecraft().getSendQueue().addToSendQueue(
-			new PacketUpdatePlayerState(want ? Cursor.STATE_ON : Cursor.STATE_OFF));
+
+		ShapesNSizesClient.sendPlayerState(player, want ? Cursor.STATE_ON : Cursor.STATE_OFF);
 
 		if (!want) {
 			player.sendStatusMessage("§7Scaled cursor §foff§7.");

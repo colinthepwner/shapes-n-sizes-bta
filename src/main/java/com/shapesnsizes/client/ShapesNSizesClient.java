@@ -18,7 +18,11 @@ import net.minecraft.client.gui.options.components.BooleanOptionComponent;
 import net.minecraft.client.gui.options.components.KeyBindingComponent;
 import net.minecraft.client.gui.options.components.OptionsCategory;
 import net.minecraft.client.gui.options.data.OptionsPages;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.InputDevice;
+import net.minecraft.client.net.handler.PacketHandlerClient;
+import net.minecraft.core.entity.player.Player;
+import net.minecraft.core.net.packet.PacketUpdatePlayerState;
 import net.minecraft.client.option.GameSettings;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.option.OptionBoolean;
@@ -127,5 +131,14 @@ public class ShapesNSizesClient implements ClientModInitializer {
 
 			ShapesNSizes.LOGGER.warn("Could not add the mod's controls to the options screen", t);
 		}
+	}
+
+	public static void sendPlayerState(Player player, int state) {
+		if (player == null || player.world == null || !player.world.isClientSide) return;
+		Minecraft mc = Minecraft.getMinecraft();
+		if (mc == null) return;
+		PacketHandlerClient queue = mc.getSendQueue();
+		if (queue == null) return;
+		queue.addToSendQueue(new PacketUpdatePlayerState(state));
 	}
 }

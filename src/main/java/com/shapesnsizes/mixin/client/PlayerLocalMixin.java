@@ -4,10 +4,9 @@ import com.shapesnsizes.Crawl;
 import com.shapesnsizes.PlayerScale;
 import com.shapesnsizes.ShapesNSizes;
 import com.shapesnsizes.client.CrawlInput;
-import net.minecraft.client.Minecraft;
+import com.shapesnsizes.client.ShapesNSizesClient;
 import net.minecraft.client.entity.player.PlayerLocal;
 import net.minecraft.client.input.PlayerInput;
-import net.minecraft.core.net.packet.PacketUpdatePlayerState;
 import org.joml.primitives.AABBdc;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -53,10 +52,8 @@ public abstract class PlayerLocalMixin extends Player {
 		if (want == crawling) return;
 		if (!want && !this.boundsClear(this.getBoundsForState(1))) return;
 		PlayerScale.setCrawling(this, want);
-		if (this.world.isClientSide) {
-			Minecraft.getMinecraft().getSendQueue().addToSendQueue(
-				new PacketUpdatePlayerState(want ? Crawl.STATE_CRAWL : Crawl.STATE_UNCRAWL));
-		}
+
+		ShapesNSizesClient.sendPlayerState(this, want ? Crawl.STATE_CRAWL : Crawl.STATE_UNCRAWL);
 	}
 
 	@Inject(method = "getFovModifier", at = @At("RETURN"), cancellable = true)
