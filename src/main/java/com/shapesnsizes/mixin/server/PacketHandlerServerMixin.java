@@ -1,5 +1,6 @@
 package com.shapesnsizes.mixin.server;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import com.shapesnsizes.Crawl;
 import com.shapesnsizes.Cursor;
 import com.shapesnsizes.ModVersion;
@@ -78,28 +79,28 @@ public abstract class PacketHandlerServerMixin {
 		else if (packet.state == Cursor.STATE_OFF) PlayerScale.setCursorOn(this.playerEntity, false);
 	}
 
-	@Redirect(
+	@ModifyExpressionValue(
 		method = "handlePlayerAction",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/player/gamemode/Gamemode;getBlockReachDistance()F")
 	)
-	private float shapesnsizes$digReach(Gamemode gamemode) {
-		return gamemode.getBlockReachDistance() * PlayerScale.abilityFactor(this.playerEntity);
+	private float shapesnsizes$digReach(float reach) {
+		return reach * PlayerScale.abilityFactor(this.playerEntity);
 	}
 
-	@Redirect(
+	@ModifyExpressionValue(
 		method = "handleUseOrPlaceItem",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/player/gamemode/Gamemode;getBlockReachDistance()F")
 	)
-	private float shapesnsizes$useReach(Gamemode gamemode) {
-		return gamemode.getBlockReachDistance() * PlayerScale.abilityFactor(this.playerEntity);
+	private float shapesnsizes$useReach(float reach) {
+		return reach * PlayerScale.abilityFactor(this.playerEntity);
 	}
 
-	@Redirect(
+	@ModifyExpressionValue(
 		method = "handleEntityInteract",
 		at = @At(value = "INVOKE", target = "Lnet/minecraft/core/player/gamemode/Gamemode;getEntityReachDistance()F")
 	)
-	private float shapesnsizes$entityReach(Gamemode gamemode) {
-		return gamemode.getEntityReachDistance() * PlayerScale.abilityFactor(this.playerEntity);
+	private float shapesnsizes$entityReach(float reach) {
+		return reach * PlayerScale.abilityFactor(this.playerEntity);
 	}
 
 	@Redirect(
